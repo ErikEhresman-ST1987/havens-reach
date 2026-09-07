@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#081018">
+  <title>Haven's Reach</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">INDEPENDENT OPERATOR CONSOLE</p>
+      <h1>Haven's Reach</h1>
+    </div>
+    <button id="resetButton" class="danger secondary">New Game</button>
+  </header>
+
+  <main class="app-shell">
+    <section class="status-grid" aria-label="Ship status">
+      <div class="status-card"><span>Credits</span><strong id="credits">0</strong></div>
+      <div class="status-card"><span>Fuel</span><strong id="fuel">0 / 0</strong></div>
+      <div class="status-card"><span>Hull</span><strong id="hull">0%</strong></div>
+      <div class="status-card"><span>Cargo</span><strong id="cargoUsed">0 / 0</strong></div>
+    </section>
+
+    <section class="panel hero-panel">
+      <div>
+        <p class="eyebrow">CURRENT LOCATION</p>
+        <h2 id="locationName"></h2>
+        <p id="locationDescription" class="muted"></p>
+      </div>
+      <div class="ship-card">
+        <span class="ship-mark" aria-hidden="true">◇</span>
+        <div>
+          <strong id="shipName"></strong>
+          <p id="shipDetails" class="muted small"></p>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs" aria-label="Operator sections">
+      <button class="tab active" data-view="overview">Overview</button>
+      <button class="tab" data-view="market">Market</button>
+      <button class="tab" data-view="contracts">Contracts</button>
+      <button class="tab" data-view="travel">Travel</button>
+      <button class="tab" data-view="ship">Ship</button>
+    </nav>
+
+    <section id="view" class="panel view-panel" aria-live="polite"></section>
+
+    <section class="panel log-panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">CAPTAIN'S LOG</p>
+          <h2>Recent Events</h2>
+        </div>
+      </div>
+      <div id="eventLog" class="event-log"></div>
+    </section>
+  </main>
+
+  <dialog id="encounterDialog">
+    <form method="dialog" class="encounter-card">
+      <p class="eyebrow">OPERATOR ENCOUNTER</p>
+      <h2 id="encounterTitle"></h2>
+      <p id="encounterText"></p>
+      <div id="encounterChoices" class="button-stack"></div>
+    </form>
+  </dialog>
+
+  <script src="game-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
