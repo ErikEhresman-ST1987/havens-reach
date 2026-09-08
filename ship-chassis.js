@@ -172,7 +172,10 @@ function installEquipment(id, fromStorage = false) {
   const existingGroupId = rule.group ? findInstalledGroupMember(rule.group) : null;
   if (existingGroupId && existingGroupId !== id) {
     const existingUpgrade = GAME_DATA.upgrades.find(item => item.id === existingGroupId);
-    if (!confirm(`Installing ${upgrade.name} will replace your current ${existingUpgrade?.name || "equipment"}. The removed unit will go into storage. Continue?`)) return;
+    if (!confirm(`Installing ${upgrade.name} will replace your current ${existingUpgrade?.name || "equipment"}. The removed unit will go into storage. Continue?`)) {
+      if (!fromStorage) state.credits += upgrade.cost;
+      return;
+    }
     addToStorage(existingGroupId, equipmentCount(state.ship, existingGroupId));
     delete state.ship.equipment[existingGroupId];
   }
@@ -275,8 +278,7 @@ function renderChassisShipManagement() {
       <div><strong>${escapeHtml(upgrade.name)}</strong><div class="muted small">${escapeHtml(upgrade.text)}</div><div class="muted small">${escapeHtml(specialty)} • Capacity ${rule.capacity}${rule.stackable ? " each • Stackable" : rule.group ? " • Replaces same-category equipment" : ""}</div></div>
       <div>${credits(upgrade.cost)}</div>
       <div>${qty ? `Installed${qty > 1 ? ` ×${qty}` : ""}` : `Uses ${rule.capacity}`}</div>
-      <button class="primary" onclick="buyUpgrade('${upgrade.id}')" ${(alreadyFixed || sameGrouped || blockedByCapacity || state.credits < upgrade.cost) ? "disabled" : ""}>${alreadyFixed || sameGrouped ? "Installed" : blockedByCapacity ? "Capacity Full" : equipmentActionLabel(upgrade.id)}</button>
-      ${qty ? `<button class="secondary" onclick="removeEquipment('${upgrade.id}')">Remove</button>` : ""}
+      <div class="button-stack"><button class="primary" onclick="buyUpgrade('${upgrade.id}')" ${(alreadyFixed || sameGrouped || blockedByCapacity || state.credits < upgrade.cost) ? "disabled" : ""}>${alreadyFixed || sameGrouped ? "Installed" : blockedByCapacity ? "Capacity Full" : equipmentActionLabel(upgrade.id)}</button>${qty ? `<button class="secondary" onclick="removeEquipment('${upgrade.id}')">Remove</button>` : ""}</div>
     </div>`;
   }).join("");
 
@@ -331,25 +333,19 @@ renderStatus = function renderStatusWithShipChassis() {
   el("shipDetails").textContent = `${chassis.type} • Hull Strength ${state.ship.hullStrength} • Engine ${state.ship.engine} • Sensors ${state.ship.sensors}`;
 };
 
-// Make the mining mission text chassis-neutral once multiple vessels exist.
 const performOperatorMissionBeforeShipChassis = performOperatorMission;
 performOperatorMission = function performOperatorMissionWithChassis() {
   const contract = state.activeContract;
   if (isOperatorMission(contract) && contract.kind === "mining" && contract.destination === state.location && contract.missionReady) {
     if ((state.ship.cargoCapacity - cargoUsed()) < 2) { addLog("The extraction shift needs two free cargo spaces for recovered ore."); return render(); }
-    return openMissionChoice(
-      "Independent Extraction Shift",
-      `The cooperative has assigned you a stable ore seam. A denser pocket is also reachable, but working it will put more strain on ${state.ship.name}'s structure.`,
-      [
-        { label: "Work the stable seam", action: "missionMiningStable" },
-        { label: "Push into the dense pocket", action: "missionMiningDense" }
-      ]
-    );
+    return openMissionChoice("Independent Extraction Shift", `The cooperative has assigned you a stable ore seam. A denser pocket is also reachable, but working it will put more strain on ${state.ship.name}'s structure.`, [
+      { label: "Work the stable seam", action: "missionMiningStable" },
+      { label: "Push into the dense pocket", action: "missionMiningDense" }
+    ]);
   }
   return performOperatorMissionBeforeShipChassis();
 };
 
-// Hull Strength modifies physical damage while preserving the established encounter choices.
 const resolveEncounterBeforeShipChassis = resolveEncounter;
 resolveEncounter = function resolveEncounterWithShipChassis(action) {
   function closeAndRender() {
@@ -357,7 +353,6 @@ resolveEncounter = function resolveEncounterWithShipChassis(action) {
     if (el("encounterDialog").open) el("encounterDialog").close();
     render();
   }
-
   if (action === "pirateRun") {
     const chance = Math.min(0.9, 0.42 + state.ship.engine * 0.13);
     if (Math.random() < chance) addLog("Your engines carried you clear before the pirate could match the burn.");
@@ -372,11 +367,8 @@ resolveEncounter = function resolveEncounterWithShipChassis(action) {
   }
   if (action === "distressTow") {
     const chance = Math.min(0.9, 0.35 + state.ship.engine * 0.14);
-    if (Math.random() < chance) {
-      const reward = 160 + state.ship.engine * 20;
-      state.credits += reward; state.reputation += 1;
-      addLog(`The tow succeeded. The freighter captain transferred ${credits(reward)} in thanks.`);
-    } else { const damage = applyHullDamage(6); addLog(`The tow line parted under load. No one was hurt, but the maneuver cost ${damage}% hull integrity.`); }
+    if (Math.random() < chance) { const reward = 160 + state.ship.engine * 20; state.credits += reward; state.reputation += 1; addLog(`The tow succeeded. The freighter captain transferred ${credits(reward)} in thanks.`); }
+    else { const damage = applyHullDamage(6); addLog(`The tow line parted under load. No one was hurt, but the maneuver cost ${damage}% hull integrity.`); }
     return closeAndRender();
   }
   if (action === "distressApproachBeacon") {
@@ -384,13 +376,8 @@ resolveEncounter = function resolveEncounterWithShipChassis(action) {
     else { const damage = applyHullDamage(7); addLog(`The vessel was tumbling unpredictably. You withdrew safely, but a collision with debris cost ${damage}% hull integrity.`); }
     return closeAndRender();
   }
-  if (action === "failurePush") {
-    const damage = applyHullDamage(8); addLog(`You pushed onward and reached port, but lost ${damage}% hull integrity.`); return closeAndRender();
-  }
-  if (action === "failureHull") {
-    const raw = state.ship.shield >= 40 ? 4 : 7;
-    const damage = applyHullDamage(raw); addLog(`You continued without stopping. The damaged panel worsened, costing ${damage}% hull integrity.`); return closeAndRender();
-  }
+  if (action === "failurePush") { const damage = applyHullDamage(8); addLog(`You pushed onward and reached port, but lost ${damage}% hull integrity.`); return closeAndRender(); }
+  if (action === "failureHull") { const raw = state.ship.shield >= 40 ? 4 : 7; const damage = applyHullDamage(raw); addLog(`You continued without stopping. The damaged panel worsened, costing ${damage}% hull integrity.`); return closeAndRender(); }
 
   const contract = state.activeContract;
   if (action === "missionMiningDense" && contract?.kind === "mining") {
@@ -402,15 +389,11 @@ resolveEncounter = function resolveEncounterWithShipChassis(action) {
   }
   if (action === "missionSalvageSearch" && contract?.kind === "salvage") {
     if (el("encounterDialog").open) el("encounterDialog").close();
-    if (state.ship.sensors >= 4 && (state.ship.cargoCapacity - cargoUsed()) >= 2) {
-      state.cargo.machineParts = (state.cargo.machineParts || 0) + 1;
-      return finishOperatorMission("Your sensors picked a serviceable component out of the surrounding debris. You recovered the flight recorder plus 1 unit of machine parts that had no active claim attached.");
-    }
+    if (state.ship.sensors >= 4 && (state.ship.cargoCapacity - cargoUsed()) >= 2) { state.cargo.machineParts = (state.cargo.machineParts || 0) + 1; return finishOperatorMission("Your sensors picked a serviceable component out of the surrounding debris. You recovered the flight recorder plus 1 unit of machine parts that had no active claim attached."); }
     if (state.ship.sensors >= 4) return finishOperatorMission("Your sensors found a serviceable component in the debris, but with no spare cargo room beyond the recorder you marked its coordinates and completed the contracted recovery.");
     const damage = applyHullDamage(3);
     return finishOperatorMission(`The weak sensors made the debris search slow and close. You recovered the recorder, but a minor impact cost ${damage}% hull integrity and nothing else proved worth salvaging.`);
   }
-
   return resolveEncounterBeforeShipChassis(action);
 };
 
