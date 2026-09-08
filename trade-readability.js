@@ -6,6 +6,13 @@
 function ensureTradeBasisState() {
   if (!state.tradeBasis || typeof state.tradeBasis !== "object") state.tradeBasis = {};
 
+  // If cargo has been consumed or removed by something other than a market sale,
+  // any old basis record must be discarded once none of that commodity remains.
+  // This prevents stale legacy cost data from contaminating a later fresh purchase.
+  Object.keys(state.tradeBasis).forEach(id => {
+    if ((state.cargo?.[id] || 0) <= 0) delete state.tradeBasis[id];
+  });
+
   // Existing saves may already contain cargo bought before cost tracking existed.
   // Mark it unknown rather than inventing a purchase price.
   Object.entries(state.cargo || {}).forEach(([id, quantity]) => {
