@@ -30,7 +30,7 @@ function ensureTradeBasisState() {
 }
 
 function recordTradePurchase(id, quantity, unitPrice) {
-  ensureTradeBasisState();
+  if (!state.tradeBasis || typeof state.tradeBasis !== "object") state.tradeBasis = {};
   if (!state.tradeBasis[id]) {
     state.tradeBasis[id] = { knownQuantity: 0, totalCost: 0, unknownQuantity: 0 };
   }
@@ -150,6 +150,14 @@ buyCommodity = function buyCommodityWithTradeReadability(id) {
   ensureTradeBasisState();
   const beforeOwned = state.cargo[id] || 0;
   const price = currentMarketPrice(state.location, id);
+
+  // Important: the underlying market purchase immediately rerenders the market.
+  // For a commodity with no pre-existing cargo, create an empty known basis first so
+  // that intermediate rerender does not misclassify the just-bought unit as legacy cargo.
+  if (beforeOwned === 0 && !state.tradeBasis[id]) {
+    state.tradeBasis[id] = { knownQuantity: 0, totalCost: 0, unknownQuantity: 0 };
+  }
+
   const result = buyCommodityBeforeTradeReadability(id);
   const afterOwned = state.cargo[id] || 0;
 
@@ -157,6 +165,11 @@ buyCommodity = function buyCommodityWithTradeReadability(id) {
     recordTradePurchase(id, afterOwned - beforeOwned, price);
     saveState();
     render();
+  } else if (beforeOwned === 0 && afterOwned === 0 && state.tradeBasis[id]?.knownQuantity === 0 && state.tradeBasis[id]?.unknownQuantity === 0) {
+    // Purchase failed (full hold, insufficient credits, sold out, etc.). Remove the
+    // temporary empty basis so future legacy detection remains accurate.
+    delete state.tradeBasis[id];
+    saveState();
   }
   return result;
 };
