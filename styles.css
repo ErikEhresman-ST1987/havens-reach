@@ -11,6 +11,9 @@
   --warn: #f2c879;
   --danger: #ef9a9a;
   --radius: 16px;
+  --station-accent: #89c8ff;
+  --station-accent-2: #9db0c0;
+  --station-tint: rgba(137, 200, 255, .06);
 }
 
 * { box-sizing: border-box; }
@@ -111,6 +114,78 @@ progress { width: 100%; height: 12px; }
 #encounterDialog::backdrop { background: rgba(0, 0, 0, .72); }
 .encounter-card { padding: 22px; }
 
+/* Station Visual Identity #1 — deliberately limited to place-identifying surfaces. */
+.hero-panel {
+  border-top: 2px solid var(--station-accent);
+  background:
+    linear-gradient(135deg, var(--station-tint), transparent 48%),
+    rgba(16, 26, 36, .94);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.01);
+}
+
+.hero-panel > div:first-child > .eyebrow { color: var(--station-accent); }
+.station-identity-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 10px;
+  padding: 9px 0 9px 10px;
+  border-left: 2px solid var(--station-accent);
+}
+.station-emblem-wrap {
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+}
+.station-emblem {
+  display: block;
+  width: 44px;
+  height: 44px;
+  fill: none;
+  stroke: var(--station-accent);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.station-emblem-secondary { stroke: var(--station-accent-2); }
+.station-emblem.compact {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.5;
+}
+.station-purpose {
+  color: var(--station-accent);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.station-admin { margin-top: 2px; font-size: .84rem; font-weight: 700; }
+.station-influence { margin-top: 1px; color: var(--muted); font-size: .75rem; }
+.station-arrival { margin-top: 5px; color: var(--text); font-size: .84rem; font-style: italic; }
+
+.station-inline-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 0 0 auto;
+  color: var(--station-accent);
+  font-size: .74rem;
+  font-weight: 700;
+  text-align: right;
+}
+.travel-station-mark {
+  display: inline-flex;
+  vertical-align: -5px;
+  margin-right: 6px;
+  color: var(--station-accent);
+}
+.travel-station-mark .station-emblem { stroke: var(--station-accent); }
+
+.log-entry:first-child { border-left-color: var(--station-accent); }
+
 @media (max-width: 680px) {
   .status-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-panel { grid-template-columns: 1fr; }
@@ -122,4 +197,9 @@ progress { width: 100%; height: 12px; }
   .market-row > :nth-child(2), .contract-row > :nth-child(2), .travel-row > :nth-child(2), .upgrade-row > :nth-child(2) { text-align: right; }
   .market-row > :nth-child(3), .contract-row > :nth-child(3), .travel-row > :nth-child(3), .upgrade-row > :nth-child(3) { grid-column: 1; }
   .market-row > :nth-child(4), .contract-row > :nth-child(4), .travel-row > :nth-child(4), .upgrade-row > :nth-child(4) { grid-column: 2; grid-row: 2; }
+
+  .station-identity-block { align-items: flex-start; gap: 10px; }
+  .station-emblem-wrap { flex-basis: 40px; width: 40px; height: 40px; }
+  .station-emblem { width: 38px; height: 38px; }
+  .station-inline-identity { max-width: 42%; font-size: .68rem; }
 }
