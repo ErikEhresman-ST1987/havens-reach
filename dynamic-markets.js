@@ -139,8 +139,7 @@ function refreshMarketGood(systemId, goodId, initial = false) {
 }
 
 function currentMarketEntry(systemId, goodId) {
-  ensureDynamicMarketState();
-  return state.dynamicMarkets[systemId]?.[goodId] || null;
+  return state.dynamicMarkets?.[systemId]?.[goodId] || null;
 }
 
 function currentMarketPrice(systemId, goodId) {
