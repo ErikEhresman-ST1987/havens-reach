@@ -2,10 +2,15 @@
 // Remembers the market prices the player actually observed at visited ports.
 // This module intentionally wraps the existing travel screen instead of rewriting core game logic.
 
-state.marketMemory = state.marketMemory || {};
-state.tripCount = Number.isFinite(state.tripCount) ? state.tripCount : 0;
+function ensureMarketMemoryState() {
+  if (!state.marketMemory || typeof state.marketMemory !== "object") state.marketMemory = {};
+  if (!Number.isFinite(state.tripCount)) state.tripCount = 0;
+}
+
+ensureMarketMemoryState();
 
 function rememberCurrentMarket() {
+  ensureMarketMemoryState();
   const system = GAME_DATA.systems[state.location];
   state.marketMemory[state.location] = {
     prices: { ...system.market },
@@ -14,6 +19,7 @@ function rememberCurrentMarket() {
 }
 
 function rememberedMarketSummary(systemId) {
+  ensureMarketMemoryState();
   const memory = state.marketMemory[systemId];
   if (!memory) return `<div class="muted small">Market data: not yet visited</div>`;
 
@@ -28,6 +34,7 @@ function rememberedMarketSummary(systemId) {
 
 const coreRenderTravel = renderTravel;
 renderTravel = function renderTravelWithMarketMemory() {
+  ensureMarketMemoryState();
   const system = GAME_DATA.systems[state.location];
   const rows = Object.entries(system.neighbors).map(([id, fuelCost]) => {
     const destination = GAME_DATA.systems[id];
@@ -44,6 +51,7 @@ renderTravel = function renderTravelWithMarketMemory() {
 
 const coreTravel = travel;
 travel = function travelWithMarketMemory(destination, fuelCost) {
+  ensureMarketMemoryState();
   if (state.ship.fuel < fuelCost) return;
   state.tripCount += 1;
   coreTravel(destination, fuelCost);
