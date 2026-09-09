@@ -1,0 +1,67 @@
+/* Haven's Reach — NPC Visual Identity #1 */
+.npc-identity-mark {
+  display: block;
+  width: 58px;
+  height: 58px;
+  fill: none;
+  stroke: var(--npc-accent, #89c8ff);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.npc-identity-mark.compact { width: 38px; height: 38px; stroke-width: 2.4; }
+.npc-identity-mark .npc-mark-secondary { stroke: var(--npc-accent-2, #9db0c0); }
+
+.npc-identified-contact {
+  border-color: color-mix(in srgb, var(--npc-accent) 72%, var(--line));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--npc-accent) 10%, transparent), var(--panel));
+}
+.npc-contact-mark {
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--npc-accent) 42%, var(--line));
+  border-radius: 10px;
+  background: rgba(8,16,24,.56);
+}
+.npc-identified-contact > div:nth-child(2) { flex: 1 1 auto; min-width: 0; }
+
+.npc-dialog-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: -4px 0 14px;
+  padding: 12px 13px;
+  border: 1px solid color-mix(in srgb, var(--npc-accent) 52%, var(--line));
+  border-left: 3px solid var(--npc-accent);
+  border-radius: 12px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--npc-accent) 9%, transparent), rgba(21,34,48,.72));
+}
+.npc-dialog-mark {
+  flex: 0 0 64px;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(8,16,24,.48);
+}
+.npc-dialog-copy { min-width: 0; }
+.npc-dialog-name { font-size: 1.08rem; font-weight: 800; color: var(--text); }
+.npc-dialog-role { margin-top: 2px; color: var(--npc-accent); font-size: .9rem; font-weight: 700; }
+.npc-dialog-descriptor { margin-top: 3px; color: var(--muted); font-size: .78rem; }
+.npc-dialog-context-title { margin: 0 0 10px; color: var(--text); font-size: 1.05rem; }
+.npc-dialog-context-title:empty { display: none; }
+
+@media (max-width: 680px) {
+  .npc-contact-mark { flex-basis: 42px; width: 42px; height: 42px; }
+  .npc-identity-mark.compact { width: 34px; height: 34px; }
+  .npc-dialog-identity { gap: 10px; padding: 10px; }
+  .npc-dialog-mark { flex-basis: 54px; width: 54px; height: 54px; }
+  .npc-dialog-mark .npc-identity-mark { width: 50px; height: 50px; }
+  .npc-dialog-name { font-size: 1rem; }
+  .npc-dialog-role { font-size: .84rem; }
+  .npc-dialog-descriptor { font-size: .72rem; }
+}
