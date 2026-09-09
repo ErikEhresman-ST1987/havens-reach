@@ -1,0 +1,74 @@
+/* Haven's Reach — Transient Field Site #1 */
+.field-site-card {
+  display: grid;
+  grid-template-columns: minmax(180px, .8fr) minmax(0, 1.2fr);
+  gap: 20px;
+  align-items: stretch;
+  padding: 18px;
+  border: 1px solid rgba(197, 138, 88, .32);
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(197, 138, 88, .08), rgba(8, 16, 24, .22));
+}
+
+.field-site-visual {
+  position: relative;
+  min-height: 190px;
+  overflow: hidden;
+  border: 1px solid rgba(142, 160, 170, .2);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 70% 25%, rgba(197, 138, 88, .12), transparent 30%),
+    radial-gradient(circle at 25% 72%, rgba(142, 160, 170, .1), transparent 26%),
+    #071019;
+}
+
+.field-site-visual::before,
+.field-site-visual::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(220, 231, 238, .62);
+  box-shadow: 34px 18px rgba(220,231,238,.35), 88px 62px rgba(220,231,238,.48), 142px 28px rgba(220,231,238,.28), 178px 116px rgba(220,231,238,.42), 58px 142px rgba(220,231,238,.3);
+}
+
+.field-site-visual::before { left: 16px; top: 18px; }
+.field-site-visual::after { right: 26px; bottom: 36px; transform: rotate(18deg); }
+
+.field-rock {
+  position: absolute;
+  display: block;
+  border: 1px solid rgba(197, 138, 88, .72);
+  background: rgba(197, 138, 88, .12);
+  transform: rotate(24deg);
+}
+
+.rock-a { width: 46px; height: 34px; left: 19%; top: 27%; border-radius: 48% 38% 54% 35%; }
+.rock-b { width: 28px; height: 23px; left: 55%; top: 20%; border-radius: 35% 55% 42% 58%; transform: rotate(-18deg); }
+.rock-c { width: 58px; height: 39px; left: 48%; top: 58%; border-radius: 58% 34% 46% 39%; transform: rotate(9deg); }
+.rock-d { width: 21px; height: 18px; left: 76%; top: 47%; border-radius: 42% 58% 35% 52%; transform: rotate(42deg); }
+
+.field-scan-line {
+  position: absolute;
+  left: 9%;
+  right: 9%;
+  top: 50%;
+  border-top: 1px dashed rgba(142, 160, 170, .34);
+}
+
+.field-site-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.field-site-copy h3 { margin-top: 3px; }
+.field-site-copy .primary { margin-top: 8px; }
+.field-map-detail { border-color: rgba(197, 138, 88, .25); }
+
+@media (max-width: 640px) {
+  .field-site-card { grid-template-columns: 1fr; }
+  .field-site-visual { min-height: 150px; }
+}
