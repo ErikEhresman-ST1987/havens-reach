@@ -186,6 +186,12 @@ progress { width: 100%; height: 12px; }
 
 .log-entry:first-child { border-left-color: var(--station-accent); }
 
+/* Market actions need an extra layout slot because Trade Readability inserts a
+   profit indicator beside Sell. Keep both controls on one clean action line. */
+.market-row:has(.trade-profit-indicator) {
+  grid-template-columns: minmax(0, 1.4fr) minmax(70px, .45fr) minmax(90px, .55fr) minmax(110px, auto) minmax(90px, .55fr);
+}
+
 @media (max-width: 680px) {
   .status-grid { grid-template-columns: repeat(2, 1fr); }
   .hero-panel { grid-template-columns: 1fr; }
@@ -194,9 +200,12 @@ progress { width: 100%; height: 12px; }
   .tab { font-size: .82rem; padding-inline: 7px; }
   .card-grid { grid-template-columns: 1fr; }
   .market-row, .contract-row, .travel-row, .upgrade-row { grid-template-columns: 1fr auto; }
+  .market-row:has(.trade-profit-indicator) { grid-template-columns: 1fr auto; }
   .market-row > :nth-child(2), .contract-row > :nth-child(2), .travel-row > :nth-child(2), .upgrade-row > :nth-child(2) { text-align: right; }
   .market-row > :nth-child(3), .contract-row > :nth-child(3), .travel-row > :nth-child(3), .upgrade-row > :nth-child(3) { grid-column: 1; }
   .market-row > :nth-child(4), .contract-row > :nth-child(4), .travel-row > :nth-child(4), .upgrade-row > :nth-child(4) { grid-column: 2; grid-row: 2; }
+  .market-row:has(.trade-profit-indicator) > .trade-profit-indicator { grid-column: 1; grid-row: 2; align-self: center; }
+  .market-row:has(.trade-profit-indicator) > button:last-child { grid-column: 2; grid-row: 2; }
 
   .station-identity-block { align-items: flex-start; gap: 10px; }
   .station-emblem-wrap { flex-basis: 40px; width: 40px; height: 40px; }
