@@ -1,0 +1,47 @@
+/* Haven's Reach — Station Visual Identity #3
+   Shared presentation grammar for lightweight handcrafted station scenes. */
+
+.station-arrival-visual {
+  position: relative;
+  overflow: hidden;
+  min-height: 150px;
+  margin: -1px 0 12px;
+  border: 1px solid var(--line);
+  border-top: 0;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: #09121b;
+}
+
+.station-scene {
+  display: block;
+  width: 100%;
+  height: clamp(150px, 20vw, 210px);
+}
+
+.arrival-visual-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 13px;
+  background: linear-gradient(90deg, rgba(5,10,15,.94), rgba(5,10,15,.68));
+  border-top: 1px solid color-mix(in srgb, var(--station-accent) 35%, transparent);
+  color: var(--muted);
+  font-size: .75rem;
+}
+
+.arrival-visual-label {
+  color: var(--station-accent);
+  font-weight: 800;
+  letter-spacing: .08em;
+}
+
+@media (max-width: 680px) {
+  .station-arrival-visual { min-height: 130px; }
+  .station-scene { height: 145px; }
+  .arrival-visual-caption { font-size: .68rem; }
+  .arrival-visual-caption > span:last-child { display: none; }
+}
