@@ -1,0 +1,93 @@
+/* Haven's Reach — Captain's Briefing
+   A compact new-game orientation: enough context to teach the player how to pay attention
+   without adding tutorial arrows, badges, or persistent guidance. */
+
+#captainsBriefingDialog {
+  width: min(calc(100% - 28px), 620px);
+  max-height: min(86vh, 760px);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--station-accent);
+  border-radius: 16px;
+  color: var(--text);
+  background:
+    linear-gradient(145deg, var(--station-tint), transparent 44%),
+    var(--panel);
+  padding: 0;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .45);
+}
+
+#captainsBriefingDialog::backdrop {
+  background: rgba(0, 0, 0, .78);
+  backdrop-filter: blur(2px);
+}
+
+.captains-briefing-card {
+  padding: clamp(20px, 5vw, 30px);
+}
+
+.captains-briefing-card h2 {
+  margin-bottom: 12px;
+}
+
+.captains-briefing-opening {
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.captains-briefing-advice {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--station-accent);
+  border-radius: 0 10px 10px 0;
+  background: rgba(255,255,255,.025);
+}
+
+.captains-briefing-advice p {
+  margin: 0;
+  font-style: italic;
+}
+
+.captains-briefing-hints {
+  margin: 18px 0 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-2);
+}
+
+.captains-briefing-hints h3 {
+  margin-bottom: 10px;
+  font-size: .95rem;
+}
+
+.captains-briefing-hints ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.captains-briefing-card .primary {
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  #captainsBriefingDialog {
+    max-height: 90vh;
+  }
+
+  .captains-briefing-card {
+    padding: 19px 17px;
+  }
+
+  .captains-briefing-opening {
+    font-size: .96rem;
+  }
+
+  .captains-briefing-hints {
+    padding: 12px 14px;
+  }
+}
