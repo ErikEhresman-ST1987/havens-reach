@@ -1,0 +1,64 @@
+/* Captain's Log Quick Access #1
+   A compact historical-reference control. It does not compete with the five
+   operational tabs and leaves the existing bottom log untouched. */
+.log-quick-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -4px 0 12px;
+}
+.log-quick-button {
+  min-height: 38px;
+  padding: 7px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+}
+.log-quick-button::before {
+  content: "≡";
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+#logQuickDialog {
+  width: min(calc(100% - 28px), 620px);
+  max-height: min(72vh, 680px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--text);
+  background: var(--panel);
+  padding: 0;
+  box-shadow: 0 18px 60px rgba(0,0,0,.45);
+}
+#logQuickDialog::backdrop { background: rgba(0,0,0,.68); }
+.log-quick-card { padding: 18px; }
+.log-quick-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.log-quick-heading h2 { margin-bottom: 0; }
+.log-quick-close { flex: 0 0 auto; min-width: 72px; }
+.log-quick-events {
+  display: grid;
+  gap: 8px;
+  max-height: 52vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 2px;
+}
+.log-quick-events .log-entry:first-child { border-left-color: var(--station-accent); }
+
+@media (max-width: 520px) {
+  .log-quick-row { justify-content: stretch; }
+  .log-quick-button {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
+  #logQuickDialog { max-height: 78vh; }
+  .log-quick-events { max-height: 60vh; }
+}
