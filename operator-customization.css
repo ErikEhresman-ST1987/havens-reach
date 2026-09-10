@@ -1,0 +1,54 @@
+/* Haven's Reach — Customization #1 */
+
+.operator-identity-card {
+  margin-bottom: 16px;
+  border-left: 3px solid var(--station-accent);
+  background: linear-gradient(90deg, var(--station-tint), var(--panel-2));
+}
+
+.operator-identity-grid {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 9px 12px;
+  align-items: center;
+  margin: 12px 0;
+}
+
+.operator-identity-grid label {
+  color: var(--muted);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.operator-identity-grid input {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+
+.operator-identity-grid input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 520px) {
+  .operator-identity-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .operator-identity-grid label:not(:first-child) {
+    margin-top: 5px;
+  }
+
+  .operator-identity-card .secondary {
+    width: 100%;
+  }
+}
