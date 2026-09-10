@@ -1,0 +1,49 @@
+/* Station Project Clarity #1
+   A branching project is one decision with two alternatives, not three unrelated cards. */
+.station-project-choice {
+  grid-column: 1 / -1;
+  padding: 14px;
+  border: 1px solid var(--station-accent);
+  border-left-width: 3px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--station-tint), rgba(16, 26, 36, .94) 46%);
+}
+
+.station-project-choice > .haven-project-card:first-child {
+  margin: -14px -14px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+  background: rgba(8, 16, 24, .28);
+}
+
+.station-project-options-label {
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.station-project-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.station-project-options > .haven-project-card {
+  min-width: 0;
+  border-color: rgba(137, 200, 255, .32);
+  background: rgba(21, 34, 48, .82);
+}
+
+.station-project-options > .haven-project-card .primary {
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .station-project-choice { padding: 10px; }
+  .station-project-choice > .haven-project-card:first-child { margin: -10px -10px 10px; }
+  .station-project-options { grid-template-columns: 1fr; }
+}
