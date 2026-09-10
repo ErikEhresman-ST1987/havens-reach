@@ -1,0 +1,43 @@
+.ambient-population-card {
+  grid-column: 1 / -1;
+}
+
+.ambient-people-list {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 0.8rem;
+}
+
+.ambient-person {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ambient-person:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.familiar-talk {
+  margin-left: 0.45rem;
+}
+
+@media (max-width: 560px) {
+  .ambient-person {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ambient-person button {
+    width: 100%;
+  }
+
+  .familiar-talk {
+    margin-left: 0;
+    margin-top: 0.45rem;
+  }
+}
