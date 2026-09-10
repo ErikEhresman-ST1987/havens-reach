@@ -1,0 +1,84 @@
+/* Haven's Reach — Phone Layout Polish #1
+   Intentionally scoped to narrow phones only. Tablet/iPad and desktop layouts remain unchanged. */
+
+@media (max-width: 520px) {
+  /* Market rows become an intentional three-stage phone layout:
+     identity/details -> price/profit -> paired actions. */
+  .market-row,
+  .market-row:has(.trade-profit-indicator) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    align-items: center;
+    padding: 14px 0;
+  }
+
+  .market-row > :first-child,
+  .market-row:has(.trade-profit-indicator) > :first-child {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .market-row > .price,
+  .market-row:has(.trade-profit-indicator) > .price {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+    text-align: left;
+  }
+
+  .market-row > button:nth-of-type(1),
+  .market-row:has(.trade-profit-indicator) > button:nth-of-type(1) {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+  }
+
+  .market-row > button:last-child,
+  .market-row:has(.trade-profit-indicator) > button:last-child {
+    grid-column: 2;
+    grid-row: 3;
+    min-width: 92px;
+    width: 100%;
+  }
+
+  .market-row:has(.trade-profit-indicator) > .trade-profit-indicator {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+    align-self: center;
+    text-align: right;
+  }
+
+  /* Contracts need a reading order, not compressed desktop columns.
+     Stack every semantic piece so long descriptions and route/risk text get full width. */
+  .contract-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    padding: 16px 0;
+  }
+
+  .contract-row > * {
+    grid-column: 1 !important;
+    grid-row: auto !important;
+    min-width: 0;
+    text-align: left !important;
+    justify-self: stretch;
+  }
+
+  .contract-row > :nth-child(2) {
+    color: var(--muted);
+    font-size: .92rem;
+  }
+
+  .contract-row > :nth-child(3) {
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .contract-row > button:last-child {
+    width: 100%;
+    margin-top: 2px;
+  }
+}
