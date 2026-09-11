@@ -9,10 +9,18 @@ function ensureContactVisitStopState() {
   return data;
 }
 
+function markContactCaughtUpButton(id) {
+  const button = view.querySelector(`.familiar-talk[onclick="openFamiliarConversation('${id}')"]`);
+  if (!button) return;
+  button.disabled = true;
+  button.textContent = "Caught Up";
+}
+
 const baseOpenContactStoppingForVisitCap = openContactStopping;
 openContactStopping = function(id) {
   const data = ensureContactVisitStopState();
   data.visit.stopped[id] = true;
+  markContactCaughtUpButton(id);
   return baseOpenContactStoppingForVisitCap(id);
 };
 
