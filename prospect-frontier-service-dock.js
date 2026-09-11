@@ -1,5 +1,5 @@
 // Haven's Reach — Prospect Station Development #1
-// Lena can invite a trusted operator to help equip a frontier service dock.
+// Lena can invite an established operator to help equip a frontier service dock.
 // The completed dock occasionally creates authored recovery leads rather than passive income.
 
 const PROSPECT_DOCK_COST = 2800;
@@ -17,19 +17,13 @@ function ensureProspectServiceDockState() {
   if (!Number.isFinite(lena.memory.frontierRecoveryLastLeadTrip)) lena.memory.frontierRecoveryLastLeadTrip = -99;
 }
 
-function lenaMeaningfullyHelped() {
-  const m = state.npcs?.lena?.memory || {};
-  return Boolean(m.rescuedAtDrift || m.guidedAtDrift || m.promisedSupport);
-}
-
 function prospectServiceDockEligible() {
   ensureProspectServiceDockState();
   const lena = state.npcs?.lena;
   return Boolean(
     lena?.met &&
     !lena.memory.frontierServiceDockCompleted &&
-    lena.relationship >= 2 &&
-    lenaMeaningfullyHelped()
+    lena.relationship >= 2
   );
 }
 
