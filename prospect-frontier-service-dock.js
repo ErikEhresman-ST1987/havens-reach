@@ -82,8 +82,8 @@ function openProspectRecoveryLead() {
   const siteId = prospectRecoveryCandidate();
   const def = typeof FIELD_NETWORK_SITES !== "undefined" ? FIELD_NETWORK_SITES[siteId] : null;
   if (!siteId || !def) return;
-  el("encounterTitle").textContent = "Captain Lena Voss — Recovery Lead";
-  el("encounterText").textContent = `The Frontier Service Dock has its first case worth passing along. A returning operator logged ${def.name} after abandoning an off-lane problem rather than risk the rest of the trip. The dock has enough information to give you usable coordinates, but Lena makes no promise that anything valuable remains.`;
+  el("encounterTitle").textContent = "Frontier Service Dock — Recovery Report";
+  el("encounterText").textContent = `Lena has a report that came through the Frontier Service Dock you helped equip. A returning operator logged ${def.name} after abandoning an off-lane problem rather than risk the rest of the trip. The dock has enough information to plot usable recovery coordinates, but Lena makes no promise that anything valuable remains.`;
   el("encounterChoices").innerHTML = `
     <button class="secondary" type="button" onclick="resolveEncounter('prospectRecoveryAccept:${siteId}')">Take the recovery coordinates</button>
     <button class="secondary" type="button" onclick="resolveEncounter('prospectRecoveryLater')">Leave it for another operator</button>`;
@@ -147,7 +147,7 @@ resolveEncounter = function resolveEncounterWithProspectDock(action) {
   if (typeof action === "string" && action.startsWith("prospectRecoveryAccept:")) {
     const siteId = action.split(":")[1];
     const def = typeof FIELD_NETWORK_SITES !== "undefined" ? FIELD_NETWORK_SITES[siteId] : null;
-    if (siteId && def && revealFieldNetworkSite(siteId, "prospect-service-dock", `FRONTIER SERVICE DOCK — A returning operator's report gives Prospect enough information to plot ${def.name}. The recovery coordinates have been added to navigation; what remains there is still uncertain.`)) {
+    if (siteId && def && revealFieldNetworkSite(siteId, "prospect-service-dock", `FRONTIER SERVICE DOCK — Recovery coordinates for ${def.name} have been added to navigation from a report routed through the Prospect dock you helped equip. What remains there is still uncertain.`)) {
       state.npcs.lena.memory.frontierRecoveryLastLeadTrip = Number.isFinite(state.tripCount) ? state.tripCount : 0;
       state.npcs.lena.memory.frontierRecoveryLeads = (state.npcs.lena.memory.frontierRecoveryLeads || 0) + 1;
     }
@@ -159,7 +159,7 @@ resolveEncounter = function resolveEncounterWithProspectDock(action) {
 
   if (action === "prospectRecoveryLater") {
     state.npcs.lena.memory.frontierRecoveryLastLeadTrip = Number.isFinite(state.tripCount) ? state.tripCount : 0;
-    addLog("Lena leaves the recovery report with the Frontier Service Dock. Another operator can take it if the problem still matters later.");
+    addLog("FRONTIER SERVICE DOCK — You leave the recovery report with Lena. Another operator can take it if the problem still matters later.");
     if (el("encounterDialog").open) el("encounterDialog").close();
     saveState();
     render();
