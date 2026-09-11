@@ -1,7 +1,6 @@
-// Haven's Reach — Contact Conversation System #1
-// Seli-only prototype: authored conversational vocabulary, contextual eligibility,
-// compatible combinations, and recent-component suppression.
-// No rewards, relationship gains, quests, or procedural free-form text.
+// Haven's Reach — Contact Conversation Refinement #1
+// Deepens familiar conversation for Mara and Seli while keeping it finite per station visit.
+// No rewards, relationship gains, quests, timers, or visible conversation counters.
 
 const SELI_CONVERSATION_PARTS = {
   openings: [
@@ -44,17 +43,67 @@ const SELI_CONVERSATION_PARTS = {
   ]
 };
 
-function ensureSeliConversationState() {
+const MARA_CONVERSATIONS = [
+  { id: "ship-noises", text: "Mara asks how the ship has been behaving and listens to the answer like someone who remembers every noise it made before it was yours. She offers one brief theory about an old vibration in the port thruster, then admits it may simply be the Wayfarer being the Wayfarer." },
+  { id: "yard-complaint", text: "Mara gives you the latest harmless complaint from the freight yard: someone has once again parked a loader exactly where everyone needs to drive. She has already solved the problem, but appears to enjoy being annoyed by it." },
+  { id: "haven-weather", text: "Mara asks whether the frontier has made Haven seem smaller when you return. Before you can decide how to answer, she adds, ‘Smaller isn't always worse. Means you know where the tools are.’" },
+  { id: "old-machine", text: "Mara tells you about a piece of station equipment everyone wanted replaced until she found the actual fault: a connector worth fewer credits than lunch. ‘New machinery has its place. Usually right after we've proved the old one is actually dead.’" },
+  { id: "uncle-memory", text: "Something about the Wayfarer reminds Mara of your uncle. She shares a small story about him insisting on finishing a repair properly when a temporary patch would have gotten him home. ‘He could be irritating that way,’ she says, with unmistakable affection." },
+  { id: "quiet-haven", text: "For a few minutes you and Mara watch ordinary station traffic come and go. She points out three people you don't know and tells you exactly which piece of equipment each of them is probably about to misuse." },
+  { id: "old-gantry", text: "Mara looks across the restored Old Gantry. ‘Still holding together,’ she says. Coming from Mara, it sounds less like an observation and more like high praise.", requiresOldGantry: true }
+];
+
+const CONTACT_STOPPINGS = {
+  seli: [
+    { id: "manifest", text: "A freight manifest arrives for Seli's review. She gives it the look of someone who knows it will not improve by waiting. ‘I should rescue this before someone turns a minor error into a tradition. Catch me next time you're through.’" },
+    { id: "incoming-crew", text: "Seli notices an incoming cargo crew looking around for her. ‘That expression means they have either a question or a problem, and experience suggests they won't know which until they reach me.’ She excuses herself with a small nod." },
+    { id: "broker-call", text: "A message indicator flashes on Seli's ledger. She reads the sender and sighs softly. ‘I have postponed this conversation with remarkable skill. Apparently not enough skill.’ She turns back to work." },
+    { id: "exchange", text: "The exchange grows noticeably busier around you. Seli glances toward the forming line. ‘Meridian has decided I have been idle long enough.’ She smiles faintly. ‘We'll continue another time.’" }
+  ],
+  mara: [
+    { id: "yard-call", text: "Someone across the freight yard calls Mara's name, followed immediately by the sound of something metallic hitting the deck. She closes her eyes for half a second. ‘That sounded expensive. I'd better go prove it isn't.’" },
+    { id: "inspection", text: "Mara notices a maintenance crew starting an inspection without her. ‘They know what they're doing,’ she says, already getting to her feet. ‘Which is why I'd like to see what they're doing. Catch me next time.’" },
+    { id: "parts-delivery", text: "A parts cart rolls into the bay and Mara checks the markings. ‘I've been waiting three days for that crate, so naturally it arrived the moment I sat down.’ She heads over before anyone can misplace it." },
+    { id: "gantry-check", text: "Mara glances toward the station works and spots something that catches her attention. ‘Probably nothing,’ she says, standing. Then she gives you a look. ‘Which is what people say immediately before it becomes something. I'll see you when you're back through.’" }
+  ]
+};
+
+function ensureContactConversationState() {
   if (!state.contactConversations || typeof state.contactConversations !== "object") state.contactConversations = {};
+
   if (!state.contactConversations.seli || typeof state.contactConversations.seli !== "object") {
     state.contactConversations.seli = { recentOpenings: [], recentSubjects: [], recentClosings: [], count: 0 };
   }
-  const s = state.contactConversations.seli;
-  if (!Array.isArray(s.recentOpenings)) s.recentOpenings = [];
-  if (!Array.isArray(s.recentSubjects)) s.recentSubjects = [];
-  if (!Array.isArray(s.recentClosings)) s.recentClosings = [];
-  if (!Number.isFinite(s.count)) s.count = 0;
-  return s;
+  const seli = state.contactConversations.seli;
+  if (!Array.isArray(seli.recentOpenings)) seli.recentOpenings = [];
+  if (!Array.isArray(seli.recentSubjects)) seli.recentSubjects = [];
+  if (!Array.isArray(seli.recentClosings)) seli.recentClosings = [];
+  if (!Number.isFinite(seli.count)) seli.count = 0;
+
+  if (!state.contactConversations.mara || typeof state.contactConversations.mara !== "object") {
+    state.contactConversations.mara = { recent: [], count: 0 };
+  }
+  const mara = state.contactConversations.mara;
+  if (!Array.isArray(mara.recent)) mara.recent = [];
+  if (!Number.isFinite(mara.count)) mara.count = 0;
+
+  if (!state.contactConversations.recentStops || typeof state.contactConversations.recentStops !== "object") {
+    state.contactConversations.recentStops = { mara: [], seli: [] };
+  }
+  if (!Array.isArray(state.contactConversations.recentStops.mara)) state.contactConversations.recentStops.mara = [];
+  if (!Array.isArray(state.contactConversations.recentStops.seli)) state.contactConversations.recentStops.seli = [];
+
+  if (!state.contactConversations.visit || typeof state.contactConversations.visit !== "object") {
+    state.contactConversations.visit = { location: state.location, counts: {} };
+  }
+  if (state.contactConversations.visit.location !== state.location) {
+    state.contactConversations.visit = { location: state.location, counts: {} };
+  }
+  if (!state.contactConversations.visit.counts || typeof state.contactConversations.visit.counts !== "object") {
+    state.contactConversations.visit.counts = {};
+  }
+
+  return state.contactConversations;
 }
 
 function activeShipChassisId() {
@@ -72,15 +121,20 @@ function seliPartEligible(part) {
   return true;
 }
 
-function chooseSeliPart(parts, recentIds) {
-  const eligible = parts.filter(seliPartEligible);
+function maraConversationEligible(part) {
+  if (part.requiresOldGantry && !state.stationProjects?.haven?.oldGantry?.completed) return false;
+  return true;
+}
+
+function chooseFresh(parts, recentIds, eligibleTest = () => true) {
+  const eligible = parts.filter(eligibleTest);
   if (!eligible.length) return parts[0];
   const fresh = eligible.filter(part => !recentIds.includes(part.id));
   const pool = fresh.length ? fresh : eligible;
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-function rememberSeliPart(list, id, limit) {
+function rememberRecent(list, id, limit) {
   const next = list.filter(value => value !== id);
   next.unshift(id);
   return next.slice(0, limit);
@@ -88,34 +142,104 @@ function rememberSeliPart(list, id, limit) {
 
 function buildSeliConversation() {
   ensureNpcState();
-  const memory = ensureSeliConversationState();
-  const opening = chooseSeliPart(SELI_CONVERSATION_PARTS.openings, memory.recentOpenings);
-  const subject = chooseSeliPart(SELI_CONVERSATION_PARTS.subjects, memory.recentSubjects);
-  const closing = chooseSeliPart(SELI_CONVERSATION_PARTS.closings, memory.recentClosings);
+  const memory = ensureContactConversationState().seli;
+  const opening = chooseFresh(SELI_CONVERSATION_PARTS.openings, memory.recentOpenings, seliPartEligible);
+  const subject = chooseFresh(SELI_CONVERSATION_PARTS.subjects, memory.recentSubjects, seliPartEligible);
+  const closing = chooseFresh(SELI_CONVERSATION_PARTS.closings, memory.recentClosings, seliPartEligible);
 
-  memory.recentOpenings = rememberSeliPart(memory.recentOpenings, opening.id, 4);
-  memory.recentSubjects = rememberSeliPart(memory.recentSubjects, subject.id, 7);
-  memory.recentClosings = rememberSeliPart(memory.recentClosings, closing.id, 4);
+  memory.recentOpenings = rememberRecent(memory.recentOpenings, opening.id, 4);
+  memory.recentSubjects = rememberRecent(memory.recentSubjects, subject.id, 7);
+  memory.recentClosings = rememberRecent(memory.recentClosings, closing.id, 4);
   memory.count += 1;
 
   return `${opening.text} ${subject.text} ${closing.text}`;
 }
 
-// Replace only Seli's Catch Up behavior. Mara and all opportunity interactions remain untouched.
-const baseOpenFamiliarConversationForSeli = openFamiliarConversation;
-openFamiliarConversation = function(id) {
-  if (id !== "seli") return baseOpenFamiliarConversationForSeli(id);
+function buildMaraConversation() {
+  const memory = ensureContactConversationState().mara;
+  const conversation = chooseFresh(MARA_CONVERSATIONS, memory.recent, maraConversationEligible);
+  memory.recent = rememberRecent(memory.recent, conversation.id, 4);
+  memory.count += 1;
+  return conversation.text;
+}
 
-  ensureNpcState();
-  const npc = NPC_DATA.seli;
-  if (!npc || !state.npcs?.seli?.met) return;
+function contactCatchUpCount(id) {
+  const data = ensureContactConversationState();
+  return data.visit.counts[id] || 0;
+}
 
-  el("encounterTitle").textContent = `${npc.name} — A Familiar Conversation`;
-  el("encounterText").textContent = buildSeliConversation();
+function incrementContactCatchUp(id) {
+  const data = ensureContactConversationState();
+  data.visit.counts[id] = contactCatchUpCount(id) + 1;
+}
+
+function buildContactStopping(id) {
+  const data = ensureContactConversationState();
+  const stops = CONTACT_STOPPINGS[id] || [];
+  if (!stops.length) return "They turn back to the rest of their day. You can catch up again the next time you're through.";
+  const recent = data.recentStops[id] || [];
+  const stop = chooseFresh(stops, recent);
+  data.recentStops[id] = rememberRecent(recent, stop.id, Math.min(3, stops.length - 1));
+  return stop.text;
+}
+
+function openContactStopping(id) {
+  const npc = NPC_DATA[id];
+  if (!npc) return;
+  el("encounterTitle").textContent = `${npc.name} — Back to the Day`;
+  el("encounterText").textContent = buildContactStopping(id);
   el("encounterChoices").innerHTML = `<button class="secondary" type="button" onclick="closeFamiliarConversation()">Continue</button>`;
   el("encounterDialog").showModal();
   saveState();
+}
+
+// Replace Catch Up behavior only for Mara and Seli. Opportunity interactions remain untouched.
+const baseOpenFamiliarConversationForContacts = openFamiliarConversation;
+openFamiliarConversation = function(id) {
+  if (id !== "mara" && id !== "seli") return baseOpenFamiliarConversationForContacts(id);
+
+  ensureNpcState();
+  const npc = NPC_DATA[id];
+  if (!npc || !state.npcs?.[id]?.met) return;
+
+  if (contactCatchUpCount(id) >= 3) {
+    openContactStopping(id);
+    return;
+  }
+
+  el("encounterTitle").textContent = `${npc.name} — A Familiar Conversation`;
+  el("encounterText").textContent = id === "seli" ? buildSeliConversation() : buildMaraConversation();
+  el("encounterChoices").innerHTML = `<button class="secondary" type="button" onclick="closeFamiliarConversation()">Continue</button>`;
+  el("encounterDialog").showModal();
+  incrementContactCatchUp(id);
+  saveState();
 };
 
-ensureSeliConversationState();
+// Once the stopping response has been seen, leave Catch Up visibly present but unavailable
+// until the operator departs and later returns. No counter is shown to the player.
+const baseRenderOverviewForContactConversationLimits = renderOverview;
+renderOverview = function() {
+  ensureContactConversationState();
+  baseRenderOverviewForContactConversationLimits();
+
+  const localContact = Object.entries(NPC_DATA).find(([, npc]) => npc.location === state.location);
+  if (!localContact) return;
+  const [id] = localContact;
+  if (id !== "mara" && id !== "seli") return;
+
+  const button = view.querySelector(`.familiar-talk[onclick="openFamiliarConversation('${id}')"]`);
+  if (button && contactCatchUpCount(id) >= 3) button.disabled = true;
+};
+
+// Any successful departure begins a new station visit. This protects the reset even if
+// the player does not open the Station tab while away before returning later.
+const baseTravelForContactConversationVisits = travel;
+travel = function(destination, fuelCost) {
+  if (state.ship.fuel < fuelCost) return baseTravelForContactConversationVisits(destination, fuelCost);
+  const data = ensureContactConversationState();
+  data.visit = { location: null, counts: {} };
+  return baseTravelForContactConversationVisits(destination, fuelCost);
+};
+
+ensureContactConversationState();
 saveState();
