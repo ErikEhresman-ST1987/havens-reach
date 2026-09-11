@@ -171,7 +171,11 @@ renderOverview = function() {
     button = card.querySelector(".familiar-talk");
   }
 
-  if (button) button.disabled = Boolean(data.visit.stopped[id]);
+  if (button) {
+    const stopped = Boolean(data.visit.stopped[id]);
+    button.disabled = stopped;
+    button.textContent = stopped ? "Caught Up" : "Catch Up";
+  }
 };
 
 EXPANDED_CONTACT_IDS.forEach(ensureExpandedContactConversationState);
