@@ -3,12 +3,12 @@
 // one-jump travel rules, fuel costs, encounters, discovery, or save data.
 
 const TRAVEL_MAP_POSITIONS = {
-  haven: [10, 42],
-  meridian: [27, 58],
-  prospect: [44, 38],
-  caldersDrift: [61, 58],
-  redMesa: [77, 36],
-  pelagos: [91, 57]
+  haven: [8, 62],
+  meridian: [24, 34],
+  prospect: [42, 68],
+  caldersDrift: [59, 30],
+  redMesa: [76, 66],
+  pelagos: [92, 38]
 };
 
 let travelMapSelectedSystem = null;
@@ -20,6 +20,30 @@ function travelMapKnownSystems() {
     ? state.navigation.knownSystems
     : Object.keys(GAME_DATA.systems);
   return known.filter(id => GAME_DATA.systems[id] && TRAVEL_MAP_POSITIONS[id]);
+}
+
+function travelMapLayoutPositions(knownIds) {
+  const isPhone = window.matchMedia?.("(max-width: 680px)")?.matches;
+  if (!isPhone) return TRAVEL_MAP_POSITIONS;
+
+  const preferredOrder = ["haven", "meridian", "prospect", "caldersDrift", "redMesa", "pelagos"];
+  const ordered = [
+    ...preferredOrder.filter(id => knownIds.includes(id)),
+    ...knownIds.filter(id => !preferredOrder.includes(id))
+  ];
+
+  const positions = {};
+  if (ordered.length === 1) {
+    positions[ordered[0]] = [50, 50];
+    return positions;
+  }
+
+  ordered.forEach((id, index) => {
+    const y = 14 + ((72 * index) / Math.max(1, ordered.length - 1));
+    const x = index % 2 === 0 ? 31 : 69;
+    positions[id] = [x, y];
+  });
+  return positions;
 }
 
 function travelMapKnownEdges(knownIds) {
@@ -63,9 +87,9 @@ function travelMapDirectFuel(id) {
   return Number.isFinite(fuel) ? fuel : null;
 }
 
-function travelMapNodeHtml(id) {
+function travelMapNodeHtml(id, positions) {
   const system = GAME_DATA.systems[id];
-  const [x, y] = TRAVEL_MAP_POSITIONS[id];
+  const [x, y] = positions[id] || TRAVEL_MAP_POSITIONS[id];
   const identity = travelMapIdentity(id);
   const isCurrent = id === state.location;
   const isSelected = id === travelMapSelectedSystem;
@@ -90,11 +114,12 @@ function travelMapNodeHtml(id) {
 function travelMapChartHtml() {
   const knownIds = travelMapKnownSystems();
   if (!travelMapSelectedSystem || !knownIds.includes(travelMapSelectedSystem)) travelMapSelectedSystem = state.location;
+  const positions = travelMapLayoutPositions(knownIds);
 
   const routeEdges = activeContractRouteEdgeKeys();
   const lines = travelMapKnownEdges(knownIds).map(edge => {
-    const [x1, y1] = TRAVEL_MAP_POSITIONS[edge.a];
-    const [x2, y2] = TRAVEL_MAP_POSITIONS[edge.b];
+    const [x1, y1] = positions[edge.a] || TRAVEL_MAP_POSITIONS[edge.a];
+    const [x2, y2] = positions[edge.b] || TRAVEL_MAP_POSITIONS[edge.b];
     const key = [edge.a, edge.b].sort().join("|");
     const routeClass = routeEdges.has(key) ? " active-contract" : "";
     const currentRouteClass = edge.a === state.location || edge.b === state.location ? " current-route" : "";
@@ -109,7 +134,7 @@ function travelMapChartHtml() {
     <div class="travel-map-chart" aria-label="Known route network">
       <div class="travel-map-starfield" aria-hidden="true"></div>
       <svg class="travel-map-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>
-      ${knownIds.map(travelMapNodeHtml).join("")}
+      ${knownIds.map(id => travelMapNodeHtml(id, positions)).join("")}
     </div>
     <div id="travelMapDetail">${travelMapDetailHtml(travelMapSelectedSystem)}</div>
     <div id="travelMapAction">${travelMapActionHtml(travelMapSelectedSystem)}</div>
@@ -215,8 +240,10 @@ function travelMapTravelTo(id) {
     return;
   }
 
-  const from = TRAVEL_MAP_POSITIONS[state.location];
-  const to = TRAVEL_MAP_POSITIONS[id];
+  const knownIds = travelMapKnownSystems();
+  const positions = travelMapLayoutPositions(knownIds);
+  const from = positions[state.location] || TRAVEL_MAP_POSITIONS[state.location];
+  const to = positions[id] || TRAVEL_MAP_POSITIONS[id];
   if (from && to) {
     chart.style.setProperty("--jump-x", `${to[0] - from[0]}`);
     chart.style.setProperty("--jump-y", `${to[1] - from[1]}`);
