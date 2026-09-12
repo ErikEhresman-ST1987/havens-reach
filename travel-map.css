@@ -1,12 +1,12 @@
-/* Haven's Reach — Travel Map #1 */
+/* Haven's Reach — Travel Navigation Experience #1 */
 .travel-map-card {
   margin-bottom: 16px;
-  padding: 14px;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 12px;
   background:
-    radial-gradient(circle at 18% 24%, rgba(137,200,255,.06), transparent 26%),
-    radial-gradient(circle at 82% 68%, rgba(143,120,200,.05), transparent 24%),
+    radial-gradient(circle at 18% 24%, rgba(137,200,255,.07), transparent 28%),
+    radial-gradient(circle at 82% 68%, rgba(143,120,200,.06), transparent 26%),
     #0b151f;
 }
 .travel-map-heading,
@@ -36,22 +36,54 @@
   background: #53687a;
 }
 .travel-map-legend .legend-current::before { background: var(--station-accent); }
+.travel-map-legend .legend-reachable::before { background: #7eb7a0; }
 .travel-map-legend .legend-contract::before { background: var(--warn); }
 
 .travel-map-chart {
   position: relative;
-  min-height: 255px;
-  margin: 10px 0 12px;
+  min-height: 360px;
+  margin: 12px 0 14px;
   overflow: hidden;
-  border: 1px solid rgba(137,200,255,.12);
-  border-radius: 10px;
+  border: 1px solid rgba(137,200,255,.14);
+  border-radius: 12px;
   background:
-    radial-gradient(circle at 11% 18%, rgba(255,255,255,.8) 0 1px, transparent 1.4px),
-    radial-gradient(circle at 32% 67%, rgba(255,255,255,.55) 0 1px, transparent 1.3px),
-    radial-gradient(circle at 57% 22%, rgba(255,255,255,.7) 0 1px, transparent 1.3px),
-    radial-gradient(circle at 76% 73%, rgba(255,255,255,.5) 0 1px, transparent 1.2px),
-    radial-gradient(circle at 91% 28%, rgba(255,255,255,.65) 0 1px, transparent 1.2px),
-    linear-gradient(180deg, #071019, #0a141e);
+    radial-gradient(circle at 20% 35%, rgba(63,111,151,.08), transparent 28%),
+    radial-gradient(circle at 72% 62%, rgba(100,74,140,.07), transparent 30%),
+    linear-gradient(180deg, #061019, #09141e 54%, #07111a);
+}
+.travel-map-starfield,
+.travel-map-starfield::before,
+.travel-map-starfield::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+.travel-map-starfield {
+  opacity: .9;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(255,255,255,.9) 0 1px, transparent 1.4px),
+    radial-gradient(circle at 16% 72%, rgba(255,255,255,.5) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 28% 31%, rgba(255,255,255,.65) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 39% 83%, rgba(255,255,255,.45) 0 1px, transparent 1.2px),
+    radial-gradient(circle at 53% 14%, rgba(255,255,255,.75) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 66% 76%, rgba(255,255,255,.55) 0 1px, transparent 1.2px),
+    radial-gradient(circle at 80% 25%, rgba(255,255,255,.72) 0 1px, transparent 1.3px),
+    radial-gradient(circle at 93% 68%, rgba(255,255,255,.48) 0 1px, transparent 1.2px);
+}
+.travel-map-starfield::before {
+  opacity: .4;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.55) 0 1px, transparent 1.2px),
+    radial-gradient(circle, rgba(137,200,255,.42) 0 1px, transparent 1.2px);
+  background-size: 92px 92px, 137px 137px;
+  background-position: 13px 21px, 41px 7px;
+}
+.travel-map-starfield::after {
+  opacity: .18;
+  background-image:
+    linear-gradient(115deg, transparent 0 46%, rgba(137,200,255,.12) 49%, transparent 52%),
+    linear-gradient(72deg, transparent 0 48%, rgba(143,120,200,.09) 50%, transparent 53%);
 }
 .travel-map-lines {
   position: absolute;
@@ -65,7 +97,11 @@
   stroke: #40586b;
   stroke-width: 2;
   stroke-linecap: round;
-  opacity: .85;
+  opacity: .58;
+}
+.travel-map-route.current-route {
+  stroke: #6f9ca8;
+  opacity: .92;
 }
 .travel-map-route.active-contract {
   stroke: var(--warn);
@@ -78,37 +114,52 @@
   display: grid;
   place-items: center;
   gap: 3px;
-  min-width: 84px;
-  padding: 5px 7px 6px;
-  border: 1px solid transparent;
+  min-width: 92px;
+  padding: 6px 8px 7px;
+  border: 1px solid rgba(137,200,255,.08);
   border-radius: 10px;
   color: var(--text);
-  background: rgba(7, 16, 25, .76);
+  background: rgba(7, 16, 25, .74);
   cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, opacity .16s ease, transform .16s ease;
 }
+.travel-map-node.remote { opacity: .72; }
+.travel-map-node.reachable {
+  border-color: rgba(126,183,160,.32);
+  box-shadow: 0 0 18px rgba(126,183,160,.04);
+}
+.travel-map-node.insufficient-fuel { opacity: .58; }
 .travel-map-node:hover,
 .travel-map-node.selected {
   border-color: var(--node-accent);
-  background: rgba(12, 25, 36, .94);
+  background: rgba(12, 25, 36, .95);
+  opacity: 1;
 }
 .travel-map-node.current {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-accent) 55%, transparent);
+  opacity: 1;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--node-accent) 55%, transparent), 0 0 24px color-mix(in srgb, var(--node-accent) 16%, transparent);
 }
 .travel-map-node-mark {
   display: grid;
   place-items: center;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   color: var(--node-accent);
 }
-.travel-map-node-mark .station-emblem { stroke: var(--node-accent); width: 24px; height: 24px; }
+.travel-map-node-mark .station-emblem { stroke: var(--node-accent); width: 26px; height: 26px; }
 .travel-map-node-mark .station-emblem-secondary { stroke: var(--node-accent-2); }
 .travel-map-node-name {
-  max-width: 110px;
-  font-size: .72rem;
+  max-width: 118px;
+  font-size: .74rem;
   font-weight: 800;
   line-height: 1.05;
   text-align: center;
+}
+.travel-map-node-fuel {
+  color: #91aa9f;
+  font-size: .55rem;
+  letter-spacing: .04em;
+  font-weight: 800;
 }
 .travel-map-you {
   color: var(--node-accent);
@@ -154,15 +205,78 @@
 .travel-map-market-row strong { white-space: nowrap; }
 .travel-map-note { margin: 8px 0 0; }
 
+.travel-map-action {
+  margin-top: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(8,18,27,.72);
+}
+.travel-map-action.direct-route,
+.travel-map-action.remote-route {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.travel-map-action p { margin: 3px 0 0; }
+.travel-map-go { flex: 0 0 auto; }
+
+.travel-map-chart.travel-jumping {
+  pointer-events: none;
+}
+.travel-map-chart.travel-jumping .travel-map-starfield {
+  animation: travel-map-star-shift .42s ease-in-out both;
+}
+.travel-map-chart.travel-jumping .travel-map-lines {
+  animation: travel-map-route-pulse .42s ease-in-out both;
+}
+.travel-map-chart.travel-jumping .travel-map-node {
+  animation: travel-map-node-settle .42s ease-in-out both;
+}
+@keyframes travel-map-star-shift {
+  0% { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: .9; }
+  48% { transform: translate3d(calc(var(--jump-x, 0) * -0.22px), calc(var(--jump-y, 0) * -0.14px), 0) scale(1.035); filter: blur(.7px); opacity: .55; }
+  100% { transform: translate3d(calc(var(--jump-x, 0) * -0.06px), calc(var(--jump-y, 0) * -0.04px), 0) scale(1.01); filter: blur(0); opacity: .82; }
+}
+@keyframes travel-map-route-pulse {
+  0%, 100% { opacity: 1; }
+  48% { opacity: .42; transform: scaleX(1.012); transform-origin: center; }
+}
+@keyframes travel-map-node-settle {
+  0% { filter: brightness(1); }
+  48% { filter: brightness(1.28); }
+  100% { filter: brightness(1); }
+}
+
+@media (max-width: 900px) {
+  .travel-map-chart { min-height: 330px; }
+}
+
 @media (max-width: 680px) {
   .travel-map-card { padding: 10px; }
   .travel-map-heading { align-items: flex-start; }
   .travel-map-legend { display: none; }
-  .travel-map-chart { min-height: 235px; }
-  .travel-map-node { min-width: 60px; padding: 4px; }
-  .travel-map-node-name { max-width: 74px; font-size: .62rem; }
+  .travel-map-chart { min-height: 300px; }
+  .travel-map-node { min-width: 64px; padding: 4px 5px 5px; }
+  .travel-map-node-name { max-width: 78px; font-size: .62rem; }
+  .travel-map-node-fuel { font-size: .49rem; }
   .travel-map-you { font-size: .49rem; }
   .travel-map-market-grid { grid-template-columns: 1fr; }
   .travel-map-detail-head { display: block; }
   .travel-map-market-age { display: inline-block; margin-top: 4px; }
+  .travel-map-action.direct-route,
+  .travel-map-action.remote-route {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .travel-map-go { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-map-chart.travel-jumping .travel-map-starfield,
+  .travel-map-chart.travel-jumping .travel-map-lines,
+  .travel-map-chart.travel-jumping .travel-map-node {
+    animation: none;
+  }
 }
