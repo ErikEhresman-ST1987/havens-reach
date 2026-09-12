@@ -41,7 +41,7 @@
 
 .travel-map-chart {
   position: relative;
-  min-height: 360px;
+  min-height: 460px;
   margin: 12px 0 14px;
   overflow: hidden;
   border: 1px solid rgba(137,200,255,.14);
@@ -250,18 +250,24 @@
 }
 
 @media (max-width: 900px) {
-  .travel-map-chart { min-height: 330px; }
+  .travel-map-chart { min-height: 410px; }
 }
 
 @media (max-width: 680px) {
   .travel-map-card { padding: 10px; }
   .travel-map-heading { align-items: flex-start; }
   .travel-map-legend { display: none; }
-  .travel-map-chart { min-height: 300px; }
-  .travel-map-node { min-width: 64px; padding: 4px 5px 5px; }
-  .travel-map-node-name { max-width: 78px; font-size: .62rem; }
-  .travel-map-node-fuel { font-size: .49rem; }
-  .travel-map-you { font-size: .49rem; }
+  .travel-map-chart { min-height: 520px; }
+  .travel-map-node {
+    min-width: 76px;
+    max-width: 116px;
+    padding: 5px 6px 6px;
+  }
+  .travel-map-node-mark { width: 26px; height: 26px; }
+  .travel-map-node-mark .station-emblem { width: 24px; height: 24px; }
+  .travel-map-node-name { max-width: 92px; font-size: .66rem; }
+  .travel-map-node-fuel { font-size: .5rem; }
+  .travel-map-you { font-size: .5rem; }
   .travel-map-market-grid { grid-template-columns: 1fr; }
   .travel-map-detail-head { display: block; }
   .travel-map-market-age { display: inline-block; margin-top: 4px; }
