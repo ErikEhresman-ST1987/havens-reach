@@ -225,28 +225,53 @@
 .travel-map-chart.travel-jumping {
   pointer-events: none;
 }
+.travel-map-chart.travel-jumping::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(137,200,255,.05) 32%, rgba(190,225,255,.24) 50%, rgba(137,200,255,.05) 68%, transparent 100%);
+  animation: travel-map-jump-flash .42s ease-in-out both;
+}
 .travel-map-chart.travel-jumping .travel-map-starfield {
   animation: travel-map-star-shift .42s ease-in-out both;
 }
+.travel-map-chart.travel-jumping .travel-map-starfield::before {
+  animation: travel-map-star-streak .42s ease-in-out both;
+}
 .travel-map-chart.travel-jumping .travel-map-lines {
   animation: travel-map-route-pulse .42s ease-in-out both;
+}
+.travel-map-chart.travel-jumping .travel-map-route.current-route {
+  stroke: #b9e8f3;
+  stroke-width: 4;
+  opacity: 1;
 }
 .travel-map-chart.travel-jumping .travel-map-node {
   animation: travel-map-node-settle .42s ease-in-out both;
 }
 @keyframes travel-map-star-shift {
   0% { transform: translate3d(0,0,0) scale(1); filter: blur(0); opacity: .9; }
-  48% { transform: translate3d(calc(var(--jump-x, 0) * -0.22px), calc(var(--jump-y, 0) * -0.14px), 0) scale(1.035); filter: blur(.7px); opacity: .55; }
-  100% { transform: translate3d(calc(var(--jump-x, 0) * -0.06px), calc(var(--jump-y, 0) * -0.04px), 0) scale(1.01); filter: blur(0); opacity: .82; }
+  48% { transform: translate3d(calc(var(--jump-x, 0) * -0.55px), calc(var(--jump-y, 0) * -0.38px), 0) scale(1.065); filter: blur(1.4px) brightness(1.45); opacity: .72; }
+  100% { transform: translate3d(calc(var(--jump-x, 0) * -0.08px), calc(var(--jump-y, 0) * -0.05px), 0) scale(1.01); filter: blur(0); opacity: .86; }
+}
+@keyframes travel-map-star-streak {
+  0%, 100% { opacity: .4; transform: scale(1); filter: blur(0); }
+  48% { opacity: .95; transform: scale(1.08, 1.02); filter: blur(1.1px) brightness(1.7); }
 }
 @keyframes travel-map-route-pulse {
-  0%, 100% { opacity: 1; }
-  48% { opacity: .42; transform: scaleX(1.012); transform-origin: center; }
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  48% { opacity: 1; transform: scaleX(1.018); transform-origin: center; filter: brightness(1.8) drop-shadow(0 0 5px rgba(137,200,255,.7)); }
 }
 @keyframes travel-map-node-settle {
   0% { filter: brightness(1); }
-  48% { filter: brightness(1.28); }
+  48% { filter: brightness(1.55); }
   100% { filter: brightness(1); }
+}
+@keyframes travel-map-jump-flash {
+  0%, 100% { opacity: 0; transform: scaleX(.72); }
+  48% { opacity: 1; transform: scaleX(1.08); }
 }
 
 @media (max-width: 900px) {
@@ -280,7 +305,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .travel-map-chart.travel-jumping::after,
   .travel-map-chart.travel-jumping .travel-map-starfield,
+  .travel-map-chart.travel-jumping .travel-map-starfield::before,
   .travel-map-chart.travel-jumping .travel-map-lines,
   .travel-map-chart.travel-jumping .travel-map-node {
     animation: none;
