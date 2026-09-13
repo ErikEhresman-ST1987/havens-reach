@@ -3,24 +3,9 @@
 // Reuses the existing NPC and ship-upgrade systems; no new simulation layer.
 
 Object.assign(NPC_DATA, {
-  orin: {
-    name: "Orin Vale",
-    role: "Navigation Surveyor",
-    location: "caldersDrift",
-    intro: "Orin Vale is an independent navigation surveyor who helped turn scattered beacon reports into reliable routes around Calder's Drift. He treats good coordinates like other people treat money."
-  },
-  draak: {
-    name: "Draak Tor",
-    role: "Kharok Systems Engineer",
-    location: "redMesa",
-    intro: "Draak Tor supervises heavy freight systems at Red Mesa Junction. The Kharok engineer speaks in short practical sentences and has little patience for equipment that fails under honest work."
-  },
-  saeli: {
-    name: "Saeli Ren",
-    role: "Elyri Survey Coordinator",
-    location: "pelagos",
-    intro: "Saeli Ren coordinates long-range survey traffic from Pelagos. The Elyri navigator is quiet, observant, and more interested in what an operator notices than how impressively they describe it."
-  }
+  orin: FIRST_FRONTIER_CONTACTS.orin,
+  draak: FIRST_FRONTIER_CONTACTS.draak,
+  saeli: FIRST_FRONTIER_CONTACTS.saeli
 });
 
 GAME_DATA.upgrades.push(
