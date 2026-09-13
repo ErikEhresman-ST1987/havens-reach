@@ -85,6 +85,45 @@ const FIRST_FRONTIER_ADDITIONAL_CONTRACTS = {
   ]
 };
 
+const FIRST_FRONTIER_CONTACTS = {
+  mara: {
+    name: "Mara Quinn",
+    role: "Shipwright",
+    location: "haven",
+    intro: "Mara Quinn helped keep the Wayfarer barely spaceworthy when you were saving every credit to leave Haven. She still runs a cramped repair bay near the old freight yards."
+  },
+  seli: {
+    name: "Seli Varen",
+    role: "Veylan Broker",
+    location: "meridian",
+    intro: "Seli Varen is a patient Veylan freight broker who seems to remember every price, promise, and favor that passes through Meridian Exchange."
+  },
+  lena: {
+    name: "Captain Lena Voss",
+    role: "Frontier Freighter Captain",
+    location: "prospect",
+    intro: "Lena Voss runs an aging frontier freighter between Prospect Reach and the settled systems. She knows which routes are profitable and which ones become dangerous without warning."
+  },
+  orin: {
+    name: "Orin Vale",
+    role: "Navigation Surveyor",
+    location: "caldersDrift",
+    intro: "Orin Vale is an independent navigation surveyor who helped turn scattered beacon reports into reliable routes around Calder's Drift. He treats good coordinates like other people treat money."
+  },
+  draak: {
+    name: "Draak Tor",
+    role: "Kharok Systems Engineer",
+    location: "redMesa",
+    intro: "Draak Tor supervises heavy freight systems at Red Mesa Junction. The Kharok engineer speaks in short practical sentences and has little patience for equipment that fails under honest work."
+  },
+  saeli: {
+    name: "Saeli Ren",
+    role: "Elyri Survey Coordinator",
+    location: "pelagos",
+    intro: "Saeli Ren coordinates long-range survey traffic from Pelagos. The Elyri navigator is quiet, observant, and more interested in what an operator notices than how impressively they describe it."
+  }
+};
+
 // Dynamic-market content belongs to the world. The Dynamic Markets module owns
 // price movement, stock, persistence, buying/selling, and market-memory behavior.
 const FIRST_FRONTIER_MARKET_GOODS = {
