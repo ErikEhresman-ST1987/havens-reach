@@ -1,80 +1,12 @@
 // Haven's Reach — Dynamic Markets #1
-// Five familiar economic categories now contain specific goods. Port catalogs differ,
-// common staples have unlimited stock, specialty goods are finite, and prices move in
-// persistent 3–6 trip market conditions rather than rerolling every visit.
+// Market content is owned by world-data.js. This module owns the proven dynamic
+// behavior: persistent conditions, stock, pricing, buying/selling, and memory.
 
-const DYNAMIC_GOODS = {
-  // Processed Ore
-  ore: { name: "Industrial Ore", category: "Processed Ore", finite: false },
-  copperOre: { name: "Copper Concentrate", category: "Processed Ore", finite: true },
-  goldOre: { name: "Gold-Bearing Ore", category: "Processed Ore", finite: true },
-
-  // Packaged Food
-  food: { name: "Staple Rations", category: "Packaged Food", finite: false },
-  preservedProduce: { name: "Preserved Produce", category: "Packaged Food", finite: true },
-  specialtyFoods: { name: "Specialty Foods", category: "Packaged Food", finite: true },
-
-  // Medicine
-  medicine: { name: "Medical Supplies", category: "Medicine", finite: false },
-  antibiotics: { name: "Antibiotics", category: "Medicine", finite: true },
-  vaccines: { name: "Vaccines", category: "Medicine", finite: true },
-
-  // Machine Parts
-  machineParts: { name: "Power Couplings", category: "Machine Parts", finite: false },
-  miningComponents: { name: "Mining Components", category: "Machine Parts", finite: true },
-  sensorComponents: { name: "Sensor Components", category: "Machine Parts", finite: true },
-
-  // Luxury Goods
-  luxuries: { name: "Artisan Goods", category: "Luxury Goods", finite: false },
-  veylanTextiles: { name: "Veylan Textiles", category: "Luxury Goods", finite: true },
-  rareCollectibles: { name: "Rare Collectibles", category: "Luxury Goods", finite: true }
-};
-
+const DYNAMIC_GOODS = FIRST_FRONTIER_MARKET_GOODS;
 Object.assign(GAME_DATA.commodities, DYNAMIC_GOODS);
 
-const MARKET_CATEGORIES = ["Processed Ore", "Packaged Food", "Medicine", "Machine Parts", "Luxury Goods"];
-
-// Base prices encode each port's economic identity. Missing goods are not traded there.
-const PORT_MARKET_BASES = {
-  haven: {
-    ore: 17, copperOre: 38, goldOre: 118,
-    food: 33, medicine: 60,
-    machineParts: 46, luxuries: 84
-  },
-  meridian: {
-    ore: 30, copperOre: 46,
-    food: 24, preservedProduce: 43, specialtyFoods: 72,
-    medicine: 51, antibiotics: 82, vaccines: 108,
-    machineParts: 57, miningComponents: 96, sensorComponents: 122,
-    luxuries: 70, veylanTextiles: 128, rareCollectibles: 178
-  },
-  prospect: {
-    food: 48, preservedProduce: 69,
-    medicine: 74, antibiotics: 103, vaccines: 136,
-    machineParts: 71, sensorComponents: 137,
-    luxuries: 101
-  },
-  caldersDrift: {
-    ore: 27, copperOre: 49,
-    food: 56, preservedProduce: 76,
-    medicine: 81,
-    machineParts: 77, sensorComponents: 116,
-    luxuries: 110
-  },
-  redMesa: {
-    ore: 14, copperOre: 29, goldOre: 91,
-    food: 62,
-    medicine: 86, antibiotics: 112,
-    machineParts: 65, miningComponents: 73,
-    luxuries: 122
-  },
-  pelagos: {
-    food: 67, preservedProduce: 84, specialtyFoods: 101,
-    medicine: 63, antibiotics: 88, vaccines: 104,
-    machineParts: 89, sensorComponents: 78,
-    luxuries: 116, rareCollectibles: 154
-  }
-};
+const MARKET_CATEGORIES = FIRST_FRONTIER_MARKET_CATEGORIES;
+const PORT_MARKET_BASES = FIRST_FRONTIER_MARKET_BASES;
 
 const MARKET_CONDITIONS = {
   surplus: { label: "Surplus", multiplier: 0.75 },
@@ -186,7 +118,6 @@ function marketStockLabel(systemId, goodId) {
   return good?.finite ? `${entry?.quantity ?? 0} available` : "Common stock";
 }
 
-// Replace the market view, but preserve the established buy/sell interaction model.
 renderMarket = function renderDynamicMarket() {
   ensureDynamicMarketState();
   updateExpiredDynamicMarkets();
@@ -278,7 +209,6 @@ sellCommodity = function sellDynamicCommodity(id) {
   render();
 };
 
-// Market memory now records the actual catalog and conditions the player personally saw.
 rememberCurrentMarket = function rememberDynamicMarket() {
   ensureMarketMemoryState();
   ensureDynamicMarketState();
@@ -320,8 +250,8 @@ rememberedMarketSummary = function rememberedDynamicMarketSummary(systemId) {
   </details>`;
 };
 
-// Advance market conditions only when a real trip occurs. The proven travel/discovery
-// stack remains responsible for navigation, encounters, contracts, fuel, and saving.
+// Dormant rollback reference. Active post-trip market behavior is now owned by
+// the explicit travel lifecycle migration introduced during Expansion Pass 2.
 const travelBeforeDynamicMarkets = travel;
 travel = function travelWithDynamicMarkets(destination, fuelCost) {
   ensureDynamicMarketState();
