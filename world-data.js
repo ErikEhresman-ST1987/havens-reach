@@ -1,5 +1,5 @@
 // Haven's Reach — World Data Foundation
-// Authoritative handcrafted geography for the six permanent First Frontier systems.
+// Authoritative handcrafted content for the permanent First Frontier.
 // Behavior remains in the existing engine modules during staged architecture hardening.
 
 const FIRST_FRONTIER_SYSTEMS = {
@@ -83,4 +83,73 @@ const FIRST_FRONTIER_ADDITIONAL_CONTRACTS = {
       text: "Carry precision survey instruments from Meridian Exchange to Pelagos Survey Anchorage. Multiple jumps required."
     }
   ]
+};
+
+// Dynamic-market content belongs to the world. The Dynamic Markets module owns
+// price movement, stock, persistence, buying/selling, and market-memory behavior.
+const FIRST_FRONTIER_MARKET_GOODS = {
+  ore: { name: "Industrial Ore", category: "Processed Ore", finite: false },
+  copperOre: { name: "Copper Concentrate", category: "Processed Ore", finite: true },
+  goldOre: { name: "Gold-Bearing Ore", category: "Processed Ore", finite: true },
+  food: { name: "Staple Rations", category: "Packaged Food", finite: false },
+  preservedProduce: { name: "Preserved Produce", category: "Packaged Food", finite: true },
+  specialtyFoods: { name: "Specialty Foods", category: "Packaged Food", finite: true },
+  medicine: { name: "Medical Supplies", category: "Medicine", finite: false },
+  antibiotics: { name: "Antibiotics", category: "Medicine", finite: true },
+  vaccines: { name: "Vaccines", category: "Medicine", finite: true },
+  machineParts: { name: "Power Couplings", category: "Machine Parts", finite: false },
+  miningComponents: { name: "Mining Components", category: "Machine Parts", finite: true },
+  sensorComponents: { name: "Sensor Components", category: "Machine Parts", finite: true },
+  luxuries: { name: "Artisan Goods", category: "Luxury Goods", finite: false },
+  veylanTextiles: { name: "Veylan Textiles", category: "Luxury Goods", finite: true },
+  rareCollectibles: { name: "Rare Collectibles", category: "Luxury Goods", finite: true }
+};
+
+const FIRST_FRONTIER_MARKET_CATEGORIES = [
+  "Processed Ore",
+  "Packaged Food",
+  "Medicine",
+  "Machine Parts",
+  "Luxury Goods"
+];
+
+const FIRST_FRONTIER_MARKET_BASES = {
+  haven: {
+    ore: 17, copperOre: 38, goldOre: 118,
+    food: 33, medicine: 60,
+    machineParts: 46, luxuries: 84
+  },
+  meridian: {
+    ore: 30, copperOre: 46,
+    food: 24, preservedProduce: 43, specialtyFoods: 72,
+    medicine: 51, antibiotics: 82, vaccines: 108,
+    machineParts: 57, miningComponents: 96, sensorComponents: 122,
+    luxuries: 70, veylanTextiles: 128, rareCollectibles: 178
+  },
+  prospect: {
+    food: 48, preservedProduce: 69,
+    medicine: 74, antibiotics: 103, vaccines: 136,
+    machineParts: 71, sensorComponents: 137,
+    luxuries: 101
+  },
+  caldersDrift: {
+    ore: 27, copperOre: 49,
+    food: 56, preservedProduce: 76,
+    medicine: 81,
+    machineParts: 77, sensorComponents: 116,
+    luxuries: 110
+  },
+  redMesa: {
+    ore: 14, copperOre: 29, goldOre: 91,
+    food: 62,
+    medicine: 86, antibiotics: 112,
+    machineParts: 65, miningComponents: 73,
+    luxuries: 122
+  },
+  pelagos: {
+    food: 67, preservedProduce: 84, specialtyFoods: 101,
+    medicine: 63, antibiotics: 88, vaccines: 104,
+    machineParts: 89, sensorComponents: 78,
+    luxuries: 116, rareCollectibles: 154
+  }
 };
