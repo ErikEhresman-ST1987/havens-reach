@@ -3,24 +3,9 @@
 // and one named travel callback without changing the core game engine.
 
 const NPC_DATA = {
-  mara: {
-    name: "Mara Quinn",
-    role: "Shipwright",
-    location: "haven",
-    intro: "Mara Quinn helped keep the Wayfarer barely spaceworthy when you were saving every credit to leave Haven. She still runs a cramped repair bay near the old freight yards."
-  },
-  seli: {
-    name: "Seli Varen",
-    role: "Veylan Broker",
-    location: "meridian",
-    intro: "Seli Varen is a patient Veylan freight broker who seems to remember every price, promise, and favor that passes through Meridian Exchange."
-  },
-  lena: {
-    name: "Captain Lena Voss",
-    role: "Frontier Freighter Captain",
-    location: "prospect",
-    intro: "Lena Voss runs an aging frontier freighter between Prospect Reach and the settled systems. She knows which routes are profitable and which ones become dangerous without warning."
-  }
+  mara: FIRST_FRONTIER_CONTACTS.mara,
+  seli: FIRST_FRONTIER_CONTACTS.seli,
+  lena: FIRST_FRONTIER_CONTACTS.lena
 };
 
 function ensureNpcState() {
