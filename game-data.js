@@ -1,38 +1,8 @@
 const GAME_DATA = {
   systems: {
-    haven: {
-      name: "Haven",
-      type: "Homeworld",
-      description: "A declining mining world where old industries are fading and independent operators are beginning to look outward.",
-      neighbors: { meridian: 18 },
-      market: { ore: 18, food: 34, medicine: 61, machineParts: 47, luxuries: 86 },
-      contracts: [
-        { id: "haven-food", title: "Supply Run", destination: "meridian", reward: 220, cargo: { food: 2 }, rep: 1, text: "A family-owned canteen needs packaged food delivered to Meridian Exchange." },
-        { id: "haven-survey", title: "Survey Data Courier", destination: "prospect", reward: 420, cargo: {}, rep: 1, text: "Carry sealed geological survey data to Prospect Reach." }
-      ]
-    },
-    meridian: {
-      name: "Meridian Exchange",
-      type: "Commercial Hub",
-      description: "A busy trade station where Veylan merchants, human freight brokers, and frontier crews cross paths.",
-      neighbors: { haven: 18, prospect: 25 },
-      market: { ore: 31, food: 24, medicine: 52, machineParts: 58, luxuries: 71 },
-      contracts: [
-        { id: "meridian-parts", title: "Machine Parts Delivery", destination: "prospect", reward: 310, cargo: { machineParts: 2 }, rep: 1, text: "A Kharok maintenance crew is short on replacement actuator assemblies." },
-        { id: "meridian-meds", title: "Medical Priority", destination: "haven", reward: 260, cargo: { medicine: 1 }, rep: 1, text: "A clinic on Haven needs a small urgent shipment of medication." }
-      ]
-    },
-    prospect: {
-      name: "Prospect Reach",
-      type: "Frontier Colony",
-      description: "A young settlement at the edge of surveyed space, rich in opportunity and permanently short on something.",
-      neighbors: { meridian: 25 },
-      market: { ore: 22, food: 49, medicine: 76, machineParts: 72, luxuries: 102 },
-      contracts: [
-        { id: "prospect-samples", title: "Salvage Samples", destination: "meridian", reward: 360, cargo: {}, rep: 1, text: "Transport recovered drive components to a buyer at Meridian Exchange." },
-        { id: "prospect-home", title: "Letter Packet", destination: "haven", reward: 180, cargo: {}, rep: 1, text: "Carry personal correspondence from frontier workers back toward Haven." }
-      ]
-    }
+    haven: FIRST_FRONTIER_SYSTEMS.haven,
+    meridian: FIRST_FRONTIER_SYSTEMS.meridian,
+    prospect: FIRST_FRONTIER_SYSTEMS.prospect
   },
   commodities: {
     ore: { name: "Processed Ore" },
