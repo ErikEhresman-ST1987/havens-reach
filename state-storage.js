@@ -2,13 +2,13 @@
 // Centralizes save-format versioning and conservative structural normalization.
 // Specialized systems remain responsible for interpreting their own legacy state.
 
-const SAVE_KEY = "havensReachPrototypeV01";
-const SAVE_RECOVERY_KEY = "havensReachRecoveryBackup";
-const CURRENT_SAVE_VERSION = 1;
+const HR_SAVE_KEY = "havensReachPrototypeV01";
+const HR_SAVE_RECOVERY_KEY = "havensReachRecoveryBackup";
+const HR_CURRENT_SAVE_VERSION = 1;
 
 function createDefaultState() {
   return {
-    saveVersion: CURRENT_SAVE_VERSION,
+    saveVersion: HR_CURRENT_SAVE_VERSION,
     location: "haven",
     credits: 700,
     reputation: 0,
@@ -59,13 +59,13 @@ function normalizeCoreState(savedState) {
   if (!Array.isArray(normalized.completedContracts)) normalized.completedContracts = [];
   if (!Array.isArray(normalized.upgrades)) normalized.upgrades = [];
   if (!Array.isArray(normalized.log)) normalized.log = [...defaults.log];
-  normalized.saveVersion = CURRENT_SAVE_VERSION;
+  normalized.saveVersion = HR_CURRENT_SAVE_VERSION;
 
   return normalized;
 }
 
 function loadStoredState() {
-  const raw = localStorage.getItem(SAVE_KEY);
+  const raw = localStorage.getItem(HR_SAVE_KEY);
   if (!raw) return createDefaultState();
 
   try {
@@ -74,7 +74,7 @@ function loadStoredState() {
   } catch (error) {
     // Preserve the unreadable value before the app can write a fresh state.
     try {
-      localStorage.setItem(SAVE_RECOVERY_KEY, raw);
+      localStorage.setItem(HR_SAVE_RECOVERY_KEY, raw);
     } catch {
       // If recovery storage itself is unavailable, continue with a safe in-memory state.
     }
@@ -84,11 +84,11 @@ function loadStoredState() {
 }
 
 function writeStoredState(currentState) {
-  currentState.saveVersion = CURRENT_SAVE_VERSION;
-  localStorage.setItem(SAVE_KEY, JSON.stringify(currentState));
+  currentState.saveVersion = HR_CURRENT_SAVE_VERSION;
+  localStorage.setItem(HR_SAVE_KEY, JSON.stringify(currentState));
 }
 
 function clearStoredState() {
-  localStorage.removeItem(SAVE_KEY);
-  localStorage.removeItem(SAVE_RECOVERY_KEY);
+  localStorage.removeItem(HR_SAVE_KEY);
+  localStorage.removeItem(HR_SAVE_RECOVERY_KEY);
 }
