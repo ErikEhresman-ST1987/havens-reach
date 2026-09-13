@@ -24,12 +24,15 @@ HavensTravelLifecycle.registerAfter("field-network", context => {
   }
 });
 
-// field-network.js saved the function that was active immediately before it installed
-// its wrapper. Restore that function, then add a lifecycle-aware dispatcher. This
-// preserves the already-proven Dynamic Markets lifecycle dispatcher underneath it.
-const travelBeforeFieldLifecycleDispatcher = travelBeforeFieldNetwork;
+// Both migrated systems now share one authoritative lifecycle dispatcher. Restore
+// the proven pre-Dynamic-Markets function (which still includes Progressive
+// Discovery validation), bypassing both old feature wrappers and the earlier
+// temporary market-only dispatcher.
+const travelBeforeMigratedLifecycle = travelBeforeDynamicMarkets;
 
-travel = function travelWithFieldLifecycle(destination, fuelCost) {
+travel = function travelWithMigratedLifecycle(destination, fuelCost) {
+  ensureDynamicMarketState();
+
   const context = {
     origin: state.location,
     requestedDestination: destination,
@@ -39,22 +42,13 @@ travel = function travelWithFieldLifecycle(destination, fuelCost) {
 
   if (HavensTravelLifecycle.runBefore(context) === false) return;
 
-  const result = travelBeforeFieldLifecycleDispatcher(destination, fuelCost);
+  const result = travelBeforeMigratedLifecycle(destination, fuelCost);
   const tripAfter = Number.isFinite(state.tripCount) ? state.tripCount : context.tripBefore;
 
   if (state.location !== context.origin || tripAfter !== context.tripBefore) {
     context.destination = state.location;
     context.tripAfter = tripAfter;
-    // Dynamic Markets already runs from the inner lifecycle dispatcher. Run only
-    // the Field Network post-travel behavior here to avoid double market updates.
-    if (context.fieldNetwork?.leavingResolved && state.location !== context.origin) {
-      completeAndRemoveFieldNetworkSite(context.origin);
-      saveState();
-      render();
-    }
-    if (!fieldNetworkIsSite(state.location) && state.location !== DRAAK_FIELD_ID) {
-      maybeDiscoverFieldByScanner();
-    }
+    HavensTravelLifecycle.runAfter(context);
   }
 
   return result;
