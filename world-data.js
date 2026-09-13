@@ -29,7 +29,7 @@ const FIRST_FRONTIER_SYSTEMS = {
     name: "Prospect Reach",
     type: "Frontier Colony",
     description: "A young settlement at the edge of surveyed space, rich in opportunity and permanently short on something.",
-    neighbors: { meridian: 25, caldersDrift: 22 },
+    neighbors: { meridian: 25 },
     market: { ore: 22, food: 49, medicine: 76, machineParts: 72, luxuries: 102 },
     contracts: [
       { id: "prospect-samples", title: "Salvage Samples", destination: "meridian", reward: 360, cargo: {}, rep: 1, text: "Transport recovered drive components to a buyer at Meridian Exchange." },
