@@ -1,26 +1,5 @@
-const SAVE_KEY = "havensReachPrototypeV01";
-
 function defaultState() {
-  return {
-    location: "haven",
-    credits: 700,
-    reputation: 0,
-    ship: {
-      name: "Wayfarer",
-      hull: 100,
-      shield: 40,
-      engine: 1,
-      sensors: 1,
-      cargoCapacity: 8,
-      fuelCapacity: 80,
-      fuel: 80
-    },
-    cargo: {},
-    activeContract: null,
-    completedContracts: [],
-    upgrades: [],
-    log: ["You left Haven with an old utility transport, a small account, and no one deciding where you go next."]
-  };
+  return createDefaultState();
 }
 
 let state = loadState();
@@ -30,16 +9,11 @@ const el = id => document.getElementById(id);
 const view = el("view");
 
 function loadState() {
-  try {
-    const saved = localStorage.getItem(SAVE_KEY);
-    return saved ? { ...defaultState(), ...JSON.parse(saved) } : defaultState();
-  } catch {
-    return defaultState();
-  }
+  return loadStoredState();
 }
 
 function saveState() {
-  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+  writeStoredState(state);
 }
 
 function cargoUsed() {
@@ -287,7 +261,7 @@ function resolveEncounter(action) {
 function resetGame() {
   if (!confirm("Start a new game? This will erase the current local save.")) return;
   state = defaultState();
-  localStorage.removeItem(SAVE_KEY);
+  clearStoredState();
   currentView = "overview";
   render();
 }
