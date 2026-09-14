@@ -1,11 +1,8 @@
-// Haven's Reach — Expansion Foundation Pass 5B3
-// Frontier Contact Encounter Action Migration
-//
-// Routes Orin, Draak, and Saeli's proven introductory encounter actions through the
-// explicit interaction dispatcher. Conversation presentation remains owned by
-// frontier-identity.js and will be addressed separately during NPC interaction routing.
+// Haven's Reach — Expansion Foundation Pass 5B3 / 5C1
+// Frontier Contact Interaction Migration
 
 const resolveFrontierIdentityBeforeDispatcher = window.resolveEncounter;
+const openFrontierNpcInteractionBeforeDispatcher = window.openNpcInteraction;
 const FRONTIER_IDENTITY_ACTIONS = new Set([
   "npcOrinBeacon",
   "npcOrinWork",
@@ -14,6 +11,7 @@ const FRONTIER_IDENTITY_ACTIONS = new Set([
   "npcSaeliObserve",
   "npcSaeliRoutes"
 ]);
+const FRONTIER_CONTACT_IDS = new Set(["orin", "draak", "saeli"]);
 
 HavensInteractionDispatcher.registerEncounterHandler("frontier-identity", action => {
   if (!FRONTIER_IDENTITY_ACTIONS.has(action)) return false;
@@ -21,6 +19,11 @@ HavensInteractionDispatcher.registerEncounterHandler("frontier-identity", action
   return true;
 });
 
-// Remove this owner's legacy resolver wrapper from the active chain. Later modules may
-// still wrap the gateway until their own Pass 5 migrations are completed.
+HavensInteractionDispatcher.registerNpcInteractionHandler("frontier-identity", id => {
+  if (!FRONTIER_CONTACT_IDS.has(id)) return false;
+  openFrontierNpcInteractionBeforeDispatcher(id);
+  return true;
+});
+
 HavensInteractionDispatcher.installEncounterGateway();
+HavensInteractionDispatcher.installNpcInteractionGateway();
