@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `5472a6feede5ab70cf658cc88dbbf8a87427bc4d` — **Pass 5 interaction ownership complete and verified**
+Verified checkpoint: `a5857031488cae74e316832e5cf177c582498af7` — **Pass 6A inactive transient-field duplicate retired and verified**
 
 ## Current status
 
@@ -144,6 +144,20 @@ Treat the following as verified at checkpoint `33ae55aa`:
 - Encounter choices continue resolving correctly.
 - No visible regression was found after the Pass 5C2 activation.
 
+## Pass 6 — Narrow compatibility retirement
+
+In progress.
+
+### Pass 6A — Inactive transient-field duplicate
+
+Implemented and manually verified.
+
+- The retirement audit proved that `transient-field-site.js` was not loaded by `index.html`.
+- Its declared behavior is present in the active consolidated owner, `transient-field.js`.
+- Only the inactive JavaScript duplicate was removed; `transient-field-site.css` remains active and untouched.
+- The project owner reopened the existing save and confirmed normal transient-field interaction behavior.
+- Commit `a585703` is the current verified Pass 6 checkpoint.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -212,7 +226,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified gameplay checkpoint `5472a6f`.
+3. Compare the latest commit with the verified checkpoint `a585703` (Pass 6A), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
