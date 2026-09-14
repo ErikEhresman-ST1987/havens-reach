@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `0d4d65a50b4d99d2c769a9e1c41121db532e04e2` — **Pass 6D inactive Calder relay duplicate retired and verified**
+Verified checkpoint: `ebecb8dce0378c075332d2815af977361f7f8c64` — **Pass 6E inactive Pelagos array duplicate retired and verified**
 
 ## Current status
 
@@ -185,6 +185,26 @@ Implemented and manually verified.
 - The project owner confirmed that Orin's relay memory and the Navigation Relay improvement panel remain correct with the existing save.
 - Commit `0d4d65a` is the current verified Pass 6 checkpoint.
 
+### Pass 6E — Inactive Pelagos array duplicate
+
+Implemented and manually verified.
+
+- The retirement audit proved that `pelagos-deep-survey-array.js` was not loaded by `index.html`.
+- All declared symbols remain present in the active consolidated owner, `station-development.js`.
+- The project owner confirmed that Saeli's array memory and the Deep Survey Array improvement panel remain correct with the existing save.
+- None of the five initially identified interaction/station duplicate files remain.
+- Commit `ebecb8d` is the current verified Pass 6 checkpoint.
+
+### Pass 6 stopping-check result
+
+The final repository-wide unloaded-script check found nine additional consolidation duplicates. Each is absent from `index.html`, and every declared symbol is present in its active consolidated owner. To preserve coherent changes without requiring nine redundant tests, handle them as three owner-based batches:
+
+1. Visual identity: `commodity-icons.js` and `npc-visual-identity.js` → `visual-identity.js`.
+2. People and conversations: `contact-caught-up-state.js`, `contact-conversations-expanded.js`, `contact-visit-cap.js`, `npc-population.js`, `recurring-npc-conversations.js`, and `seli-conversations.js` → `people-conversations.js`.
+3. Transient-field arrival: `transient-field-arrival.js` → `transient-field.js`.
+
+After these batches are verified, stop Pass 6 unless a new audit produces equally direct evidence that another file is both unloaded and fully owned elsewhere. Loaded compatibility files and captured implementation wrappers are not retirement candidates merely because their public entry points now use dispatchers.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -253,7 +273,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `0d4d65a` (Pass 6D), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the verified checkpoint `ebecb8d` (Pass 6E), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
