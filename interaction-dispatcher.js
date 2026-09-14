@@ -1,13 +1,14 @@
-// Haven's Reach — Expansion Foundation Pass 5A
+// Haven's Reach — Expansion Foundation Pass 5A / 5B1
 // Interaction Dispatcher Foundation
 //
-// Provides explicit extension points for encounter actions and NPC interaction routing
-// without changing current behavior. Existing wrapper chains remain authoritative until
-// migrated one at a time in later Pass 5 slices.
+// Provides explicit extension points for encounter actions and NPC interaction routing.
+// Pass 5B1 adds a compatibility gateway so migrated encounter owners can use the
+// dispatcher while unhandled actions continue through the proven base resolver.
 
 window.HavensInteractionDispatcher = (() => {
   const encounterHandlers = [];
   const npcInteractionHandlers = [];
+  const baseEncounterResolver = window.resolveEncounter;
 
   function register(list, id, handler) {
     if (typeof id !== "string" || !id || typeof handler !== "function") return false;
@@ -38,6 +39,13 @@ window.HavensInteractionDispatcher = (() => {
     return false;
   }
 
+  function installEncounterGateway() {
+    window.resolveEncounter = function resolveEncounterThroughDispatcher(action) {
+      if (dispatchEncounter(action)) return;
+      return baseEncounterResolver(action);
+    };
+  }
+
   function registeredHandlers() {
     return {
       encounter: encounterHandlers.map(entry => entry.id),
@@ -50,6 +58,7 @@ window.HavensInteractionDispatcher = (() => {
     registerNpcInteractionHandler,
     dispatchEncounter,
     dispatchNpcInteraction,
+    installEncounterGateway,
     registeredHandlers
   };
 })();
