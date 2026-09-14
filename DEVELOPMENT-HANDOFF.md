@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `89887d141077f442b10ac765327ccb40aceea76e` — **Activate Pass 5D1 renewable field lead routing**
+Verified checkpoint: `5472a6feede5ab70cf658cc88dbbf8a87427bc4d` — **Pass 5 interaction ownership complete and verified**
 
 ## Current status
 
@@ -12,8 +12,9 @@ The Expansion Foundation hardening work is intact and stable. `main` remains the
 - All architecture work remains isolated on `expansion-foundation`.
 - Existing browser save compatibility has been preserved.
 - No rollback, reconstruction, or restart is needed.
-- Pass 5C2 and Pass 5D1 have been manually tested by the project owner.
-- Pass 5D1 is the current confirmed stable checkpoint.
+- Pass 5 interaction ownership has been structurally audited across the active runtime chain.
+- The project owner manually verified the migrated interaction families, including operator missions and restricted-cargo customs failure.
+- Pass 5 is complete. Commit `5472a6f` is the current confirmed stable gameplay checkpoint.
 
 The repository is the authority for exact implementation state. This document is the authority for where development should resume.
 
@@ -62,7 +63,7 @@ Complete and stable for the First Frontier.
 
 ### Pass 5 — Explicit interaction ownership
 
-Implemented through Pass 5C2 and manually verified.
+Complete, structurally audited, and manually verified.
 
 #### Encounter routing
 
@@ -105,6 +106,32 @@ Implemented, activated, and manually verified.
 - The proven behavior remains owned by `field-network-renewal.js`.
 - The project owner generated and accepted a renewable NPC lead and confirmed the expected result.
 
+#### Pass 5D2–5D4 — Cross-cutting interaction precedence
+
+Implemented, activated, and manually verified.
+
+- Smuggling customs detection runs as an explicit interceptor before ordinary customs resolution.
+- Chassis-aware travel outcomes retain explicit precedence for the six outcomes they modify.
+- Contract-variety mission outcomes retain explicit precedence and match the active mission kind.
+- The project owner verified ordinary customs, restricted-cargo detection and confiscation, chassis-aware outcomes, and operator-mission resolution.
+
+#### Pass 5E1–5E2 — Remaining NPC ownership
+
+Implemented, activated, and manually verified.
+
+- Renewable field-lead NPC offers route through the dispatcher while preserving authored one-time lead priority.
+- Station-development interactions for Seli, Lena, Orin, and Saeli route through the dispatcher.
+- The final runtime gateway is installed after all registered owners, preventing later legacy wrappers from reclaiming the public interaction paths.
+
+#### Final interaction audit
+
+Complete.
+
+- Every reachable encounter and NPC family loaded by `index.html` has an explicit dispatcher owner or deliberate base fallback.
+- Interceptor and handler precedence matches the proven legacy behavior.
+- No later-loaded wrapper replaces either final dispatcher gateway.
+- Duplicate standalone source files not loaded by `index.html` were identified as Pass 6 retirement candidates; they are not active routing gaps.
+
 ## Pass 5C2 verification
 
 The project owner tested the current branch after activation and reported that everything looked good.
@@ -130,17 +157,16 @@ Treat the following as verified at checkpoint `33ae55aa`:
 
 ## Locked progression
 
-The interaction audit is complete. Continue through the following bounded sequence:
+Pass 5 is complete at the named stable gameplay checkpoint `5472a6f`. Continue through the following bounded sequence:
 
-1. Repair smuggling-contract customs interception.
-2. Repair chassis-aware encounter outcomes.
-3. Repair contract-variety precedence.
-4. Complete explicit ownership for the remaining station-development and renewable-field NPC hooks.
-5. Re-audit interaction ownership. If no reachable path is uncovered, declare Pass 5 complete and create a named stable checkpoint.
-6. Perform a narrow Pass 6 cleanup: organize the finished structure and retire only wrappers or compatibility files proven inactive and safe to remove.
-7. Stop hardening when Second Frontier features can be added through stable state, lifecycle, navigation, interaction, and rendering extension points without introducing new global wrapper chains.
+1. Perform a read-only Pass 6 retirement audit.
+2. Classify each legacy wrapper or compatibility file as active owner, inactive fallback, inactive duplicate, or uncertain.
+3. Retire only the smallest proven-inactive batch.
+4. Activate and manually verify that batch against `ARCHITECTURE-REGRESSION-BASELINE.md`.
+5. Repeat only while another removal is clearly beneficial and equally well proven.
+6. Stop hardening when Second Frontier features can be added through stable state, lifecycle, navigation, interaction, and rendering extension points without introducing new global wrapper chains.
 
-Do not turn Pass 6 into a general rewrite. Do not combine these repairs. Each remains a separate implementation, activation, and user-verification step.
+Do not turn Pass 6 into a general rewrite. Do not reorganize active files merely for neatness. Never combine uncertain retirement, file reorganization, and new Second Frontier content in one change.
 
 ## Post-hardening lessons work
 
@@ -168,9 +194,9 @@ These lessons were demonstrated directly by the Haven's Reach hardening and reco
 - **A successful prototype can outgrow its assumptions:** Hardening should occur when expansion pressure appears, before adding another major region or feature family—not automatically during the earliest experiment and not after unlimited growth.
 - **Every hardening effort needs a stopping condition:** The goal is a dependable expansion foundation, not architectural perfection.
 
-## Testing discipline for the next pass
+## Testing discipline for Pass 6
 
-Use `ARCHITECTURE-REGRESSION-BASELINE.md` as the full reference. At minimum, any interaction-routing change must verify:
+Use `ARCHITECTURE-REGRESSION-BASELINE.md` as the full reference. At minimum, any retirement batch must verify:
 
 - An ordinary core-contact conversation
 - An ordinary frontier-contact conversation
@@ -186,9 +212,9 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `89887d14`.
+3. Compare the latest commit with the verified gameplay checkpoint `5472a6f`.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
-5. Return to `89887d14` conceptually—not destructively—when diagnosing a regression.
+5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
 
 ## Product direction remains unchanged
