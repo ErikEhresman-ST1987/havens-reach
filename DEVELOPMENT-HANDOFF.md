@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `a5857031488cae74e316832e5cf177c582498af7` — **Pass 6A inactive transient-field duplicate retired and verified**
+Verified checkpoint: `822a24dfb504e811373b5d73591bacb688f62cd6` — **Pass 6B inactive Meridian berth duplicate retired and verified**
 
 ## Current status
 
@@ -158,6 +158,15 @@ Implemented and manually verified.
 - The project owner reopened the existing save and confirmed normal transient-field interaction behavior.
 - Commit `a585703` is the current verified Pass 6 checkpoint.
 
+### Pass 6B — Inactive Meridian berth duplicate
+
+Implemented and manually verified.
+
+- The retirement audit proved that `meridian-trade-berth.js` was not loaded by `index.html`.
+- All declared symbols remain present in the active consolidated owner, `station-development.js`.
+- The project owner confirmed that Seli's berth memory and the Independent Trade Berth improvement panel remain correct with the existing save.
+- Commit `822a24d` is the current verified Pass 6 checkpoint.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -226,7 +235,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `a585703` (Pass 6A), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the verified checkpoint `822a24d` (Pass 6B), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
