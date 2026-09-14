@@ -124,6 +124,41 @@ const FIRST_FRONTIER_CONTACTS = {
   }
 };
 
+const FIRST_FRONTIER_RECURRING_NPCS = {
+  nera: {
+    name: "Nera Pell",
+    species: "Ruun",
+    role: "Recovery Technician",
+    intro: "Nera Pell is a Ruun recovery technician passing through with a battered tool case and the air of someone who has already noticed three useful things everyone else walked past.",
+    first: "Nera glances toward a discarded cargo latch near the wall. ‘People call things useless when what they usually mean is inconvenient.’ She turns it over once, already considering what it could become.",
+    again: "Nera recognizes you and lifts the same battered tool case in greeting. ‘Still working,’ she says. It is not entirely clear whether she means the case, herself, or both."
+  },
+  tal: {
+    name: "Tal Ivers",
+    species: "Human",
+    role: "Independent Courier",
+    intro: "Tal Ivers is an independent human courier between jobs, travel jacket folded over the next chair and a half-finished drink close at hand.",
+    first: "Tal says the frontier has taught him one useful rule: never complain about an old ship that starts when asked. He asks what you fly, listens to the answer, and leaves it at that.",
+    again: "Tal spots you first. ‘Good. You're still flying.’ He gives you a quick account of a delayed delivery and an argument with a loading crane. Neither story contains a request for help."
+  },
+  vessa: {
+    name: "Vessa Oran",
+    species: "Veylan",
+    role: "Cargo Assessor",
+    intro: "Vessa Oran is a Veylan cargo assessor traveling between ports. She watches loading crews with professional interest but seems in no hurry to turn the conversation into business.",
+    first: "Vessa asks which port has treated you fairly lately. When you answer, she offers one of her own observations in return—not a valuable tip, just the sort of exchange that makes a conversation feel balanced.",
+    again: "Vessa remembers your previous conversation without prompting. This time she offers a small piece of port gossip first, then smiles faintly. ‘There. Now you owe me something equally unimportant.’"
+  },
+  koren: {
+    name: "Koren Vahl",
+    species: "Kharok",
+    role: "Galley Mechanic",
+    intro: "Koren Vahl is a Kharok galley mechanic traveling with a compact case of cooking equipment. A repaired handle on the case is older than the rest and obviously built to stay repaired.",
+    first: "Koren says he services galley equipment because crews notice very quickly when food or coffee stops appearing. ‘Important machinery is whatever people miss when it breaks.’",
+    again: "Koren recognizes you and taps the repaired handle on his case. ‘You saw this last time. Still good.’ He seems genuinely pleased by the report."
+  }
+};
+
 // Dynamic-market content belongs to the world. The Dynamic Markets module owns
 // price movement, stock, persistence, buying/selling, and market-memory behavior.
 const FIRST_FRONTIER_MARKET_GOODS = {
