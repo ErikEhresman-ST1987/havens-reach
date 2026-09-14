@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `047eaed4eb614de774905f247e621e48fae86647` — **Pass 6C inactive Prospect dock duplicate retired and verified**
+Verified checkpoint: `0d4d65a50b4d99d2c769a9e1c41121db532e04e2` — **Pass 6D inactive Calder relay duplicate retired and verified**
 
 ## Current status
 
@@ -176,6 +176,15 @@ Implemented and manually verified.
 - The project owner confirmed that Lena's dock memory and the Frontier Service Dock improvement panel remain correct with the existing save.
 - Commit `047eaed` is the current verified Pass 6 checkpoint.
 
+### Pass 6D — Inactive Calder relay duplicate
+
+Implemented and manually verified.
+
+- The retirement audit proved that `calder-navigation-relay.js` was not loaded by `index.html`.
+- All declared symbols remain present in the active consolidated owner, `station-development.js`.
+- The project owner confirmed that Orin's relay memory and the Navigation Relay improvement panel remain correct with the existing save.
+- Commit `0d4d65a` is the current verified Pass 6 checkpoint.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -244,7 +253,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `047eaed` (Pass 6C), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the verified checkpoint `0d4d65a` (Pass 6D), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
