@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `c6b22e4d808cf896a203c60a06e28a5fbfcce102` — **Pass 6F inactive visual-identity duplicates retired and verified**
+Verified checkpoint: `69a649b430bf6c5c6a884e9dd79d9535d7cd3c4b` — **Pass 6G inactive people/conversation duplicates retired and verified**
 
 ## Current status
 
@@ -214,6 +214,15 @@ Implemented and manually verified.
 - The project owner confirmed normal commodity icons, colors, and NPC visual styling with the existing save.
 - Commit `c6b22e4` is the current verified Pass 6 checkpoint.
 
+### Pass 6G — Inactive people and conversation duplicates
+
+Implemented and manually verified.
+
+- Six unloaded people/conversation source files were retired as one owner-based batch.
+- Every declared symbol remains present in the active consolidated owner, `people-conversations.js`.
+- The project owner confirmed that both ordinary Talk and Catch Up conversations work normally with the existing save.
+- Commit `69a649b` is the current verified Pass 6 checkpoint.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -282,7 +291,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `c6b22e4` (Pass 6F), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the verified checkpoint `69a649b` (Pass 6G), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
