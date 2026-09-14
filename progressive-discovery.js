@@ -1,9 +1,18 @@
-// Haven's Reach — Progressive Discovery #1
+// Haven's Reach — Progressive Discovery #1 / Expansion Foundation Pass 4E
 // The frontier exists in GAME_DATA, but the operator's navigation map grows through play.
 // Existing saves retain frontier systems that the player has already physically visited.
 
 const CORE_KNOWN_SYSTEMS = ["haven", "meridian", "prospect"];
-const FRONTIER_DISCOVERY_CHAIN = ["caldersDrift", "redMesa", "pelagos"];
+
+// Historical compatibility only. Before persistent route graphs existed, the original
+// First Frontier was discovered in this authored order. This map is used once to rescue
+// old saves that have evidence of a visited frontier port but no initialized graph.
+// It is not a rule for current or future discovery.
+const LEGACY_FIRST_FRONTIER_REACHABILITY = {
+  caldersDrift: ["caldersDrift"],
+  redMesa: ["caldersDrift", "redMesa"],
+  pelagos: ["caldersDrift", "redMesa", "pelagos"]
+};
 
 function ensureNavigationDiscoveryState() {
   if (!state.navigation) state.navigation = {};
@@ -15,23 +24,21 @@ function ensureNavigationDiscoveryState() {
     if (!state.navigation.knownSystems.includes(id)) state.navigation.knownSystems.push(id);
   });
 
-  // Never strand or erase knowledge from an existing save. Market memory proves a port
-  // was previously visited; the current location obviously does too. Add prerequisite
-  // route stops so every preserved frontier location remains reachable on the known map.
-  const previouslyVisited = new Set([state.location]);
-  if (state.marketMemory && typeof state.marketMemory === "object") {
-    Object.keys(state.marketMemory).forEach(id => previouslyVisited.add(id));
-  }
+  // Compatibility runs only before the persistent route graph has been initialized.
+  // Once graph state exists, knownSystems/knownRoutes are authoritative and no system
+  // knowledge is inferred from the historical First Frontier sequence.
+  if (state.navigation.routeGraphInitialized !== true) {
+    const previouslyVisited = new Set([state.location]);
+    if (state.marketMemory && typeof state.marketMemory === "object") {
+      Object.keys(state.marketMemory).forEach(id => previouslyVisited.add(id));
+    }
 
-  function preserveThrough(id) {
-    const index = FRONTIER_DISCOVERY_CHAIN.indexOf(id);
-    if (index < 0) return;
-    FRONTIER_DISCOVERY_CHAIN.slice(0, index + 1).forEach(systemId => {
-      if (!state.navigation.knownSystems.includes(systemId)) state.navigation.knownSystems.push(systemId);
+    previouslyVisited.forEach(id => {
+      (LEGACY_FIRST_FRONTIER_REACHABILITY[id] || []).forEach(systemId => {
+        if (!state.navigation.knownSystems.includes(systemId)) state.navigation.knownSystems.push(systemId);
+      });
     });
   }
-
-  previouslyVisited.forEach(preserveThrough);
 }
 
 function isSystemKnown(id) {
