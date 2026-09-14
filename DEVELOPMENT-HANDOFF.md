@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `ebecb8dce0378c075332d2815af977361f7f8c64` — **Pass 6E inactive Pelagos array duplicate retired and verified**
+Verified checkpoint: `c6b22e4d808cf896a203c60a06e28a5fbfcce102` — **Pass 6F inactive visual-identity duplicates retired and verified**
 
 ## Current status
 
@@ -205,6 +205,15 @@ The final repository-wide unloaded-script check found nine additional consolidat
 
 After these batches are verified, stop Pass 6 unless a new audit produces equally direct evidence that another file is both unloaded and fully owned elsewhere. Loaded compatibility files and captured implementation wrappers are not retirement candidates merely because their public entry points now use dispatchers.
 
+### Pass 6F — Inactive visual-identity duplicates
+
+Implemented and manually verified.
+
+- `commodity-icons.js` and `npc-visual-identity.js` were absent from `index.html` and exactly represented in `visual-identity.js`.
+- Only the inactive JavaScript duplicates were removed; the active commodity and NPC visual CSS files remain loaded.
+- The project owner confirmed normal commodity icons, colors, and NPC visual styling with the existing save.
+- Commit `c6b22e4` is the current verified Pass 6 checkpoint.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -273,7 +282,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `ebecb8d` (Pass 6E), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the verified checkpoint `c6b22e4` (Pass 6F), using `5472a6f` as the completed Pass 5 gameplay baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
