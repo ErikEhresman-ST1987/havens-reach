@@ -2,7 +2,7 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `69a649b430bf6c5c6a884e9dd79d9535d7cd3c4b` — **Pass 6G inactive people/conversation duplicates retired and verified**
+Verified checkpoint: `8a179c88e8425246f1fa208853251f6f9a9903d4` — **Pass 6H complete; expansion foundation hardened and verified**
 
 ## Current status
 
@@ -14,7 +14,9 @@ The Expansion Foundation hardening work is intact and stable. `main` remains the
 - No rollback, reconstruction, or restart is needed.
 - Pass 5 interaction ownership has been structurally audited across the active runtime chain.
 - The project owner manually verified the migrated interaction families, including operator missions and restricted-cargo customs failure.
-- Pass 5 is complete. Commit `5472a6f` is the current confirmed stable gameplay checkpoint.
+- Pass 5 interaction ownership is complete at gameplay checkpoint `5472a6f`.
+- Pass 6 compatibility retirement is complete and manually verified.
+- Commit `8a179c8` is the final confirmed hardening checkpoint.
 
 The repository is the authority for exact implementation state. This document is the authority for where development should resume.
 
@@ -146,7 +148,7 @@ Treat the following as verified at checkpoint `33ae55aa`:
 
 ## Pass 6 — Narrow compatibility retirement
 
-In progress.
+Complete and manually verified.
 
 ### Pass 6A — Inactive transient-field duplicate
 
@@ -223,6 +225,19 @@ Implemented and manually verified.
 - The project owner confirmed that both ordinary Talk and Catch Up conversations work normally with the existing save.
 - Commit `69a649b` is the current verified Pass 6 checkpoint.
 
+### Pass 6H — Inactive transient-field arrival duplicate
+
+Implemented and manually verified.
+
+- `transient-field-arrival.js` was absent from `index.html` and exactly represented in `transient-field.js`.
+- The project owner confirmed that travel to Draak's temporary field coordinates still opens the field overview immediately.
+- A final repository check found zero unloaded JavaScript files.
+- Commit `8a179c8` is the final verified Pass 6 and hardening checkpoint.
+
+### Pass 6 conclusion
+
+Pass 6 retired fourteen proven-inactive duplicate JavaScript files in controlled, recoverable batches. Each consolidated owner was verified through the affected player-facing behavior. No active compatibility layer or implementation wrapper was removed merely for structural neatness.
+
 ## Important architectural cautions
 
 - Do not merge `expansion-foundation` into `main` merely because an individual pass is stable. Merge only after the full foundation is judged ready.
@@ -234,18 +249,19 @@ Implemented and manually verified.
 - Keep HTML, CSS, vanilla JavaScript, GitHub Pages, and local ownership.
 - Apply one coherent structural change at a time and test the affected behavior before continuing.
 
-## Locked progression
+## Hardening stopping condition
 
-Pass 5 is complete at the named stable gameplay checkpoint `5472a6f`. Continue through the following bounded sequence:
+Reached.
 
-1. Perform a read-only Pass 6 retirement audit.
-2. Classify each legacy wrapper or compatibility file as active owner, inactive fallback, inactive duplicate, or uncertain.
-3. Retire only the smallest proven-inactive batch.
-4. Activate and manually verify that batch against `ARCHITECTURE-REGRESSION-BASELINE.md`.
-5. Repeat only while another removal is clearly beneficial and equally well proven.
-6. Stop hardening when Second Frontier features can be added through stable state, lifecycle, navigation, interaction, and rendering extension points without introducing new global wrapper chains.
+- State and save migration have explicit ownership.
+- Travel-dependent behavior uses lifecycle registration.
+- Discovery and navigation support safe expansion.
+- Encounter and NPC behavior use explicit dispatch ownership and precedence.
+- Consolidated rendering, visual identity, people/conversations, station development, and transient-field owners are active.
+- Every JavaScript file remaining in the repository is loaded by `index.html`; no unloaded duplicate remains.
+- Loaded compatibility files and captured implementation wrappers remain because they still support active behavior or safe fallback paths.
 
-Do not turn Pass 6 into a general rewrite. Do not reorganize active files merely for neatness. Never combine uncertain retirement, file reorganization, and new Second Frontier content in one change.
+Do not continue cleanup for neatness. Further architectural work requires a demonstrated expansion need or a reproduced failure. The next development phase may add Second Frontier features through the established extension points.
 
 ## Post-hardening lessons work
 
@@ -291,7 +307,7 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `69a649b` (Pass 6G), using `5472a6f` as the completed Pass 5 gameplay baseline.
+3. Compare the latest commit with the final hardening checkpoint `8a179c8`, using `5472a6f` as the completed Pass 5 interaction baseline.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
 5. Return to `5472a6f` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
