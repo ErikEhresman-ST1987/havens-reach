@@ -2,17 +2,18 @@
 
 Updated: 2026-09-14  
 Active development branch: `expansion-foundation`  
-Verified checkpoint: `33ae55aad0068c6e3f4bd4263516cbcc10351ba1` — **Activate Pass 5C2 special NPC interaction routing**
+Verified checkpoint: `89887d141077f442b10ac765327ccb40aceea76e` — **Activate Pass 5D1 renewable field lead routing**
 
 ## Current status
 
-The Expansion Foundation hardening work is intact and stable. The branch is 68 commits ahead of `main` and 0 commits behind it at this checkpoint.
+The Expansion Foundation hardening work is intact and stable. `main` remains the protected baseline while the branch advances through controlled, tested passes.
 
 - `main` remains the known-good playable First Frontier version and GitHub Pages source.
 - All architecture work remains isolated on `expansion-foundation`.
 - Existing browser save compatibility has been preserved.
 - No rollback, reconstruction, or restart is needed.
-- Pass 5C2 has been manually tested by the project owner and is a confirmed stable checkpoint.
+- Pass 5C2 and Pass 5D1 have been manually tested by the project owner.
+- Pass 5D1 is the current confirmed stable checkpoint.
 
 The repository is the authority for exact implementation state. This document is the authority for where development should resume.
 
@@ -96,6 +97,14 @@ Pass 5C2 migrated and activated the specialized later-loaded interactions:
 
 Registration precedence is intentional: specialized later-loaded interaction owners receive the first opportunity to handle an NPC, while ordinary conversations remain available underneath them.
 
+#### Pass 5D1 — Renewable Field Lead repair
+
+Implemented, activated, and manually verified.
+
+- Renewable NPC field-lead Accept and Later actions now have explicit dispatcher routing.
+- The proven behavior remains owned by `field-network-renewal.js`.
+- The project owner generated and accepted a renewable NPC lead and confirmed the expected result.
+
 ## Pass 5C2 verification
 
 The project owner tested the current branch after activation and reported that everything looked good.
@@ -119,20 +128,30 @@ Treat the following as verified at checkpoint `33ae55aa`:
 - Keep HTML, CSS, vanilla JavaScript, GitHub Pages, and local ownership.
 - Apply one coherent structural change at a time and test the affected behavior before continuing.
 
-## Next logical development step
+## Locked progression
 
-Begin with a read-only completion audit of interaction ownership.
+The interaction audit is complete. Continue through the following bounded sequence:
 
-The audit should:
+1. Repair smuggling-contract customs interception.
+2. Repair chassis-aware encounter outcomes.
+3. Repair contract-variety precedence.
+4. Complete explicit ownership for the remaining station-development and renewable-field NPC hooks.
+5. Re-audit interaction ownership. If no reachable path is uncovered, declare Pass 5 complete and create a named stable checkpoint.
+6. Perform a narrow Pass 6 cleanup: organize the finished structure and retire only wrappers or compatibility files proven inactive and safe to remove.
+7. Stop hardening when Second Frontier features can be added through stable state, lifecycle, navigation, interaction, and rendering extension points without introducing new global wrapper chains.
 
-1. Inventory every remaining assignment or wrapper of `window.resolveEncounter` and `window.openNpcInteraction`.
-2. Map each legacy wrapper to its explicit dispatcher registration.
-3. Identify any interaction family that still reaches the player but lacks explicit ownership.
-4. Confirm that specialized NPC precedence matches the proven legacy behavior.
-5. Separate wrappers that are now inactive compatibility layers from wrappers that still perform necessary feature work.
-6. Recommend the smallest next pass, if any, without deleting compatibility code.
+Do not turn Pass 6 into a general rewrite. Do not combine these repairs. Each remains a separate implementation, activation, and user-verification step.
 
-If the audit finds no uncovered player-facing path, declare interaction migration complete and create a named checkpoint before considering file retirement. If it finds an uncovered path, migrate only that family, activate it with a cache-version change, and run the relevant regression tests.
+## Post-hardening lessons work
+
+After the Haven's Reach foundation is complete:
+
+1. Make one focused revision to **App Development Principles and Methods** adding an **Architecture Before Expansion** section.
+2. Create one lean, reusable **Project Foundation Plan** template for substantial new apps.
+3. Require the plan to identify state ownership, save migration, lifecycles, registration points, interaction ownership, rendering ownership, data/behavior boundaries, dependency order, protected behavior, verification, deferrals, and a stopping condition.
+4. Leave the Mobile Interface and SVG guidelines lean and unchanged unless later project evidence demonstrates a specific missing rule.
+
+This documentation work must remain grounded in behavior and failure modes observed in Haven's Reach and the other completed apps. It should not grow into a general reference library or collect unsupported best practices.
 
 ## Testing discipline for the next pass
 
@@ -152,9 +171,9 @@ If a future development chat ends unexpectedly:
 
 1. Do not restart or recreate the project.
 2. Inspect the head of `expansion-foundation`.
-3. Compare the latest commit with the verified checkpoint `33ae55aa`.
+3. Compare the latest commit with the verified checkpoint `89887d14`.
 4. Treat later committed changes as implemented but unverified unless the handoff records successful testing.
-5. Return to `33ae55aa` conceptually—not destructively—when diagnosing a regression.
+5. Return to `89887d14` conceptually—not destructively—when diagnosing a regression.
 6. Preserve `main` as the known-good playable baseline.
 
 ## Product direction remains unchanged
