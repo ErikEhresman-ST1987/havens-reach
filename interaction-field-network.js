@@ -1,7 +1,8 @@
-// Haven's Reach — Expansion Foundation Pass 5B4
-// Field Network NPC Lead Encounter Migration
+// Haven's Reach — Expansion Foundation Pass 5B4 / 5C2
+// Field Network NPC Lead Interaction Migration
 
 const resolveFieldNetworkBeforeDispatcher = window.resolveEncounter;
+const openFieldNetworkBeforeDispatcher = window.openNpcInteraction;
 
 HavensInteractionDispatcher.registerEncounterHandler("field-network", action => {
   if (typeof action !== "string") return false;
@@ -10,4 +11,11 @@ HavensInteractionDispatcher.registerEncounterHandler("field-network", action => 
   return true;
 });
 
+HavensInteractionDispatcher.registerNpcInteractionHandler("field-network", id => {
+  if (!npcFieldLeadAvailable(id)) return false;
+  openFieldNetworkBeforeDispatcher(id);
+  return true;
+});
+
 HavensInteractionDispatcher.installEncounterGateway();
+HavensInteractionDispatcher.installNpcInteractionGateway();
