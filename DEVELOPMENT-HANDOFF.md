@@ -153,6 +153,21 @@ After the Haven's Reach foundation is complete:
 
 This documentation work must remain grounded in behavior and failure modes observed in Haven's Reach and the other completed apps. It should not grow into a general reference library or collect unsupported best practices.
 
+## Lessons capture queue
+
+These lessons were demonstrated directly by the Haven's Reach hardening and recovery. Preserve them for the post-foundation documentation review; merge them into existing guidance where possible rather than automatically creating more documents.
+
+- **Repository over conversation:** Chat history is working context, not the durable project record. Exact code state belongs in version control, and the current verified state and next step belong in a repository-backed handoff.
+- **Separate implementation, activation, and verification:** A change can be written but not loaded, loaded but not exercised, or exercised only on a common path. Record these as distinct states.
+- **Cache activation is part of deployment:** For static browser apps, updating a file without updating its cache/version reference can leave users running older code.
+- **Test ownership paths, not only visible screens:** Common gameplay can look correct while rare, conditional, or late-game interactions are bypassed. Test representative paths for every registered owner and every cross-cutting rule.
+- **Audit the actual runtime chain:** When replacing wrappers, inventory every definition, reassignment, capture, registration, fallback, and script-load position. The intended migration list is not proof that all reachable behavior was migrated.
+- **Cross-cutting behavior needs explicit precedence:** Smuggling detection, chassis-aware damage, and varied mission outcomes modify behavior owned elsewhere. Such overlays require a deliberate composition or priority rule rather than competing global wrappers.
+- **The second wrapper is an architecture warning:** When a second feature needs to wrap the same shared global function, stop adding wrappers and create a stable registration or lifecycle point before the chain grows.
+- **Compatibility code needs a retirement test:** Preserve legacy behavior during migration, but label whether each wrapper is active, inactive fallback, or duplicated compatibility. Remove it only after the replacement path and regression coverage are proven.
+- **A successful prototype can outgrow its assumptions:** Hardening should occur when expansion pressure appears, before adding another major region or feature family—not automatically during the earliest experiment and not after unlimited growth.
+- **Every hardening effort needs a stopping condition:** The goal is a dependable expansion foundation, not architectural perfection.
+
 ## Testing discipline for the next pass
 
 Use `ARCHITECTURE-REGRESSION-BASELINE.md` as the full reference. At minimum, any interaction-routing change must verify:
