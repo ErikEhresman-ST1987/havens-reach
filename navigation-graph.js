@@ -1,10 +1,10 @@
-// Haven's Reach — Expansion Foundation Pass 4A
+// Haven's Reach — Expansion Foundation Pass 4A/4C
 // Navigation Graph Foundation
 //
-// Introduces persistent route knowledge as a concept separate from system knowledge.
-// This pass deliberately preserves current First Frontier behavior: every physical link
-// between systems the operator already knows is inferred as a known route. Later Pass 4
-// slices can make system discovery and route discovery happen independently.
+// Separates persistent route knowledge from system knowledge. Pass 4A migrated existing
+// saves by inferring the routes that the old system treated as known. Pass 4C freezes
+// that migration after initialization so future system and route discoveries can occur
+// explicitly and independently.
 
 function navigationRouteKey(a, b) {
   return [a, b].sort().join("|");
@@ -21,20 +21,23 @@ function ensureNavigationGraphState() {
   if (!Array.isArray(state.navigation.knownSystems)) state.navigation.knownSystems = [];
   if (!Array.isArray(state.navigation.knownRoutes)) state.navigation.knownRoutes = [];
 
-  const known = new Set(state.navigation.knownSystems.filter(id => GAME_DATA.systems[id]));
-  const routeSet = new Set(state.navigation.knownRoutes.filter(key => typeof key === "string" && key.includes("|")));
+  // One-time compatibility migration. Saves created before explicit route ownership
+  // inferred route knowledge from every physical link whose endpoints were already
+  // known. Once recorded, route knowledge becomes persistent fact and is no longer
+  // automatically derived from system knowledge.
+  if (state.navigation.routeGraphInitialized !== true) {
+    const known = new Set(state.navigation.knownSystems.filter(id => GAME_DATA.systems[id]));
+    const routeSet = new Set(state.navigation.knownRoutes.filter(key => typeof key === "string" && key.includes("|")));
 
-  // Pass 4A migration rule: preserve the exact current map for every existing save.
-  // Any physical connection whose endpoints are already known becomes a known route.
-  // This is intentionally one-way migration behavior; later discovery code will add
-  // new systems/routes explicitly rather than relying on this inference forever.
-  known.forEach(a => {
-    Object.keys(GAME_DATA.systems[a]?.neighbors || {}).forEach(b => {
-      if (known.has(b) && navigationPhysicalRouteExists(a, b)) routeSet.add(navigationRouteKey(a, b));
+    known.forEach(a => {
+      Object.keys(GAME_DATA.systems[a]?.neighbors || {}).forEach(b => {
+        if (known.has(b) && navigationPhysicalRouteExists(a, b)) routeSet.add(navigationRouteKey(a, b));
+      });
     });
-  });
 
-  state.navigation.knownRoutes = [...routeSet];
+    state.navigation.knownRoutes = [...routeSet];
+    state.navigation.routeGraphInitialized = true;
+  }
 }
 
 function isRouteKnown(a, b) {
@@ -58,9 +61,6 @@ function discoverRoute(a, b, reason = "") {
   return true;
 }
 
-// Pass 4A route finder: same Dijkstra behavior as Progressive Discovery, but edges now
-// come from the operator's persistent known-route graph rather than merely assuming
-// that two known neighboring systems imply route knowledge.
 shortestRoute = function shortestKnownNavigationGraphRoute(start, goal) {
   ensureNavigationGraphState();
   if (!isSystemKnown(start) || !isSystemKnown(goal)) return null;
@@ -102,8 +102,6 @@ shortestRoute = function shortestKnownNavigationGraphRoute(start, goal) {
   return { path, fuel: dist[goal] };
 };
 
-// Keep the operational map visually identical in 4A while making its edges read from
-// the new route-knowledge owner. Travel enforcement itself remains unchanged until 4B.
 if (typeof travelMapKnownEdges === "function") {
   travelMapKnownEdges = function travelMapKnownNavigationEdges(knownIds) {
     ensureNavigationGraphState();
