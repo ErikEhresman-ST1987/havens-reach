@@ -82,6 +82,13 @@ function render() {
 function renderOverview() {
   const system = GAME_DATA.systems[state.location];
   const active = state.activeContract;
+  const localCards = Array.isArray(system.overviewCards)
+    ? system.overviewCards.map(card => `
+      <article class="info-card">
+        <h3>${escapeHtml(card.title)}</h3>
+        <p>${escapeHtml(card.text)}</p>
+      </article>`).join("")
+    : "";
   view.innerHTML = `
     <div class="section-heading"><div><p class="eyebrow">PORT OVERVIEW</p><h2>${escapeHtml(system.name)}</h2></div></div>
     <div class="card-grid">
@@ -89,6 +96,7 @@ function renderOverview() {
       <article class="info-card"><h3>Reputation</h3><p><strong>${state.reputation}</strong> operator standing</p><p class="muted small">People are beginning to learn whether your word is worth something.</p></article>
       <article class="info-card"><h3>Current Contract</h3>${active ? `<p><strong>${escapeHtml(active.title)}</strong></p><p>${escapeHtml(active.text)}</p><p class="good">Destination: ${escapeHtml(GAME_DATA.systems[active.destination].name)}</p>` : `<p class="muted">No contract accepted. Check the contract board for work.</p>`}</article>
       <article class="info-card"><h3>Operator Advice</h3><p>Buy where a commodity is cheap, sell where it is scarce. Keep enough fuel to reach your destination.</p></article>
+      ${localCards}
     </div>`;
 }
 
@@ -294,5 +302,3 @@ function resetGame() {
 
 document.querySelectorAll(".tab").forEach(tab => tab.addEventListener("click", () => { currentView = tab.dataset.view; render(); }));
 el("resetButton").addEventListener("click", resetGame);
-
-render();
