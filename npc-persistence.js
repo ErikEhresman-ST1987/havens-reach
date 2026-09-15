@@ -45,7 +45,11 @@ function npcRelationshipLabel(value) {
 }
 
 function npcAtCurrentPort() {
-  return Object.entries(NPC_DATA).find(([, npc]) => npc.location === state.location);
+  return npcsAtCurrentPort()[0];
+}
+
+function npcsAtCurrentPort() {
+  return Object.entries(NPC_DATA).filter(([, npc]) => npc.location === state.location);
 }
 
 function npcCallbackText(id) {
@@ -79,19 +83,20 @@ renderOverview = function() {
   ensureNpcState();
   baseRenderOverviewForNpcs();
 
-  const local = npcAtCurrentPort();
-  if (!local) return;
+  const locals = npcsAtCurrentPort();
+  if (!locals.length) return;
 
-  const [id, npc] = local;
-  const npcState = state.npcs[id];
-  const contactHtml = `
-    <article class="info-card">
-      <h3>Local Contact</h3>
-      <p><strong>${escapeHtml(npc.name)}</strong> — ${escapeHtml(npc.role)}</p>
-      <p class="muted small">Relationship: ${npcRelationshipLabel(npcState.relationship)}</p>
-      <p class="muted small">${escapeHtml(npcCallbackText(id))}</p>
-      <button class="secondary" type="button" onclick="openNpcInteraction('${id}')">${npcState.met ? "Talk" : "Meet"}</button>
-    </article>`;
+  const contactHtml = locals.map(([id, npc]) => {
+    const npcState = state.npcs[id];
+    return `
+      <article class="info-card">
+        <h3>Local Contact</h3>
+        <p><strong>${escapeHtml(npc.name)}</strong> — ${escapeHtml(npc.role)}</p>
+        <p class="muted small">Relationship: ${npcRelationshipLabel(npcState.relationship)}</p>
+        <p class="muted small">${escapeHtml(npcCallbackText(id))}</p>
+        <button class="secondary" type="button" onclick="openNpcInteraction('${id}')">${npcState.met ? "Talk" : "Meet"}</button>
+      </article>`;
+  }).join("");
 
   const grid = view.querySelector(".card-grid");
   if (grid) grid.insertAdjacentHTML("beforeend", contactHtml);

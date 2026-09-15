@@ -12,10 +12,12 @@ ensureMarketMemoryState();
 function rememberCurrentMarket() {
   ensureMarketMemoryState();
   const system = GAME_DATA.systems[state.location];
+  if (!system) return false;
   state.marketMemory[state.location] = {
     prices: { ...system.market },
     trip: state.tripCount
   };
+  return true;
 }
 
 function rememberedMarketSummary(systemId) {
@@ -60,7 +62,7 @@ travel = function travelWithMarketMemory(destination, fuelCost) {
 };
 
 // The player begins on Haven, so its market is legitimately known from the start.
-if (!state.marketMemory[state.location]) {
+if (!state.marketMemory[state.location] && GAME_DATA.systems[state.location]) {
   rememberCurrentMarket();
   saveState();
 }

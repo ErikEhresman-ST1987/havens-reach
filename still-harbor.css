@@ -1,0 +1,47 @@
+/* Haven's Reach — Crimson Expanse and Still Harbor presentation.
+   Dark-crimson atmosphere stays subordinate to readable game information. */
+
+:root[data-region="crimson-expanse"] body {
+  background:
+    radial-gradient(circle at 82% 9%, rgba(116, 29, 49, .34), transparent 31%),
+    radial-gradient(circle at top, #29111d 0, var(--bg) 42%);
+}
+
+:root[data-region="crimson-expanse"] .topbar {
+  background: rgba(18, 9, 16, .93);
+}
+
+.still-harbor-scene {
+  filter: saturate(.94) contrast(1.02);
+}
+
+:root[data-region="crimson-expanse"] .tabs:has(.tab[data-view="cantina"].active) + #view {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(16, 26, 36, .90), rgba(16, 26, 36, .94)),
+    radial-gradient(ellipse at 82% 18%, rgba(189, 103, 116, .28), transparent 34%),
+    linear-gradient(115deg, transparent 0 34%, rgba(210, 167, 111, .09) 35% 37%, transparent 38% 63%, rgba(189, 103, 116, .10) 64% 67%, transparent 68%);
+}
+
+:root[data-region="crimson-expanse"] .tabs:has(.tab[data-view="cantina"].active) + #view::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 16% 4% auto auto;
+  width: min(42%, 320px);
+  aspect-ratio: 2.2 / 1;
+  opacity: .16;
+  border: 2px solid var(--station-accent);
+  border-radius: 44% 16% 38% 12%;
+  box-shadow: -52px 34px 0 -47px var(--station-accent-2), -112px 58px 0 -105px var(--station-accent);
+}
+
+@media (max-width: 680px) {
+  :root[data-region="crimson-expanse"] .tabs:has(.tab[data-view="cantina"].active) + #view::before {
+    inset: 12% -10% auto auto;
+    width: 72%;
+    opacity: .10;
+  }
+}

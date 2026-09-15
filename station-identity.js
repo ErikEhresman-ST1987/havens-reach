@@ -101,8 +101,9 @@ function stationEmblemSvg(id, compact = false) {
 
 function applyStationTheme() {
   const identity = stationIdentity();
-  if (!identity) return;
   const root = document.documentElement;
+  root.dataset.region = identity?.region || "first-frontier";
+  if (!identity) return;
   root.style.setProperty("--station-accent", identity.accent);
   root.style.setProperty("--station-accent-2", identity.accent2);
   root.style.setProperty("--station-tint", identity.tint);

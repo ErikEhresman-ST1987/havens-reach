@@ -30,6 +30,10 @@ function ensureCantinaState() {
 }
 
 function localNpcEntry() {
+  const preferredId = CANTINA_DATA[state.location]?.contactId;
+  if (preferredId && NPC_DATA[preferredId]?.location === state.location) {
+    return [preferredId, NPC_DATA[preferredId]];
+  }
   return Object.entries(NPC_DATA).find(([, npc]) => npc.location === state.location);
 }
 

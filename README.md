@@ -2,20 +2,23 @@
 
 A calm, story-rich space operator game about ships, stories, trade, exploration, reputation, and opportunity.
 
-## Prototype v0.1
+## Current playable build
 
 This repository contains a small vertical slice designed to test the core gameplay loop before expanding the galaxy.
 
-Current prototype includes:
+Current build includes:
 
-- 3 handcrafted systems: Haven, Meridian Exchange, and Prospect Reach
-- 1 starter utility transport
-- 5 trade commodities with local pricing
-- Contract board and deliveries
+- 7 permanent handcrafted systems across the First and Second Frontiers
+- Still Harbor, the first permanent destination in the Crimson Expanse
+- Progressive one-leg-at-a-time route discovery and an operational travel map
+- Dynamic port markets, 17 trade commodities, remembered prices, and limited specialty stock
+- Rotating contract boards, deliveries, operator missions, and non-combat encounters
+- Persistent named contacts, recurring conversations, and a small moving background population
+- Temporary field discoveries alongside the permanent route network
+- Multiple ship chassis, practical upgrades, repair, refueling, and cargo management
 - Credits, fuel, hull, cargo, reputation, and upgrades
-- Non-combat operator encounters
 - Local browser saving with `localStorage`
-- Phone-friendly text-and-panel interface
+- Phone-, tablet-, and desktop-responsive text-and-panel interface
 - HTML, CSS, and vanilla JavaScript only
 
 ## Core loop
@@ -34,6 +37,6 @@ Open `index.html` in a browser. For normal development, serving the repository w
 
 The project is a static website and is ready to be hosted with GitHub Pages. In the repository settings, enable Pages for the `main` branch/root if it is not already enabled.
 
-## Scope discipline
+## Current scope boundary
 
-Do not expand immediately to the planned 12-system galaxy. First determine whether this 3-system loop is understandable, reliable, and fun enough to justify expansion.
+Still Harbor establishes the doorway into the Second Frontier. Information Convergence, the next outward system, player gas mining, refining, factions, crew, property, and larger simulation layers are deliberately not part of this batch. Play Still Harbor first and let curiosity about what lies farther out identify the next thin point.

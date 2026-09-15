@@ -3,7 +3,7 @@
 // Existing saves retain frontier systems that the player has already physically visited.
 
 const CORE_KNOWN_SYSTEMS = ["haven", "meridian", "prospect"];
-const FRONTIER_DISCOVERY_CHAIN = ["caldersDrift", "redMesa", "pelagos"];
+const FRONTIER_DISCOVERY_CHAIN = ["caldersDrift", "redMesa", "pelagos", "stillHarbor"];
 
 function ensureNavigationDiscoveryState() {
   if (!state.navigation) state.navigation = {};
@@ -206,6 +206,13 @@ function discoverPelagos() {
   renderCantina();
 }
 
+function discoverStillHarbor() {
+  if (state.location !== "pelagos") return;
+  const unlocked = discoverSystem("stillHarbor", "Ordinary outbound flight plans from Pelagos confirm a maintained route through the Crimson Expanse to Still Harbor.");
+  if (unlocked) addLog("Still Harbor is now charted beyond Pelagos—the first permanent port across the Second Frontier.");
+  renderCantina();
+}
+
 // Add discovery opportunities to the proven cantina view after it renders.
 const renderCantinaBeforeDiscovery = renderCantina;
 renderCantina = function renderCantinaWithDiscovery() {
@@ -233,6 +240,13 @@ renderCantina = function renderCantinaWithDiscovery() {
         <h3>Ask About the Outer Anchorage</h3>
         <p class="muted small">Several crews know the Pelagos supply run. A verified navigation vector should be obtainable here.</p>
         <button class="secondary" type="button" onclick="discoverPelagos()">Acquire outer survey vector</button>
+      </article>`;
+  } else if (state.location === "pelagos" && !isSystemKnown("stillHarbor")) {
+    html = `
+      <article class="info-card" style="margin-top:16px">
+        <h3>Compare Outbound Flight Plans</h3>
+        <p class="muted small">Several crews are provisioning for the same maintained route through the Crimson Expanse. Their destination is a permanent frontier anchorage called Still Harbor.</p>
+        <button class="secondary" type="button" onclick="discoverStillHarbor()">Chart the route to Still Harbor</button>
       </article>`;
   }
 
