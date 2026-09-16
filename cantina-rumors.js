@@ -20,6 +20,12 @@ const CANTINA_DATA = {
     description: "A prefab frontier canteen bolted to Prospect Reach's main habitation ring. Survey crews, salvagers, miners, and independent captains swap route conditions over strong coffee and whatever arrived on the last supply ship.",
     rumor: "A survey crew keeps mentioning a faint navigation beacon beyond the regular Prospect lanes. Most operators dismiss it as an old maintenance marker, but the coordinates are consistent.",
     news: "FRONTIER RELAY — Elyri survey vessels have begun a new mapping initiative along several outer trade corridors. The project is expected to improve long-range navigation data over the coming months."
+  },
+  stillHarbor: {
+    name: "Keith's Bar",
+    description: "A warm, crowded room assembled where two old hull sections meet a newer habitation spine. Keith's bar serves miners, traders, wanderers, pioneers, and crews provisioning for routes farther outward.",
+    rumor: "Two guarded haulers are comparing fuel margins for a run beyond the local charts. Neither names the destination, but both are loading enough provisions for more than a trip back to Pelagos.",
+    news: "STILL HARBOR TRAFFIC — Dock control has opened two overflow berths after another week of heavy outward provisioning. Arrivals are advised that repair and refueling services remain fully operational."
   }
 };
 

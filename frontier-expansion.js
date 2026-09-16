@@ -22,6 +22,12 @@ if (meridianPelagosContract && !GAME_DATA.systems.meridian.contracts.some(c => c
   GAME_DATA.systems.meridian.contracts.push(meridianPelagosContract);
 }
 
+const pelagosStillHarborContract = SECOND_FRONTIER_ADDITIONAL_CONTRACTS.pelagos
+  .find(contract => contract.id === "pelagos-still-harbor");
+if (pelagosStillHarborContract && !GAME_DATA.systems.pelagos.contracts.some(c => c.id === pelagosStillHarborContract.id)) {
+  GAME_DATA.systems.pelagos.contracts.push(pelagosStillHarborContract);
+}
+
 function shortestRoute(start, goal) {
   if (start === goal) return { path: [start], fuel: 0 };
   const dist = { [start]: 0 };

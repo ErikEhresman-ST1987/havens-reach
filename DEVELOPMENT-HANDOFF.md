@@ -1,15 +1,20 @@
 # Haven's Reach — Development Handoff
 
-Updated: 2026-09-14  
-Active development branch: `expansion-foundation`  
-Verified checkpoint: `8a179c88e8425246f1fa208853251f6f9a9903d4` — **Pass 6H complete; expansion foundation hardened and verified**
+Updated: 2026-09-16
+
+Active development branch: `expansion-foundation`
+
+Verified foundation checkpoint: `8a179c88e8425246f1fa208853251f6f9a9903d4` — **Pass 6H complete; expansion foundation hardened and verified**
+
+Current implementation: **Second Frontier Batch 1 — Crimson Expanse & Still Harbor is integrated and technically verified; real-device play verification remains pending.**
 
 ## Current status
 
 The Expansion Foundation hardening work is intact and stable. `main` remains the protected baseline while the branch advances through controlled, tested passes.
 
-- `main` remains the known-good playable First Frontier version and GitHub Pages source.
+- `main` remains an untouched backup branch during Second Frontier work.
 - All architecture work remains isolated on `expansion-foundation`.
+- GitHub Pages serves the current `expansion-foundation` build.
 - Existing browser save compatibility has been preserved.
 - No rollback, reconstruction, or restart is needed.
 - Pass 5 interaction ownership has been structurally audited across the active runtime chain.
@@ -17,6 +22,48 @@ The Expansion Foundation hardening work is intact and stable. `main` remains the
 - Pass 5 interaction ownership is complete at gameplay checkpoint `5472a6f`.
 - Pass 6 compatibility retirement is complete and manually verified.
 - Commit `8a179c8` is the final confirmed hardening checkpoint.
+
+## Second Frontier Batch 1 — Crimson Expanse & Still Harbor
+
+Implemented on the hardened `expansion-foundation` architecture.
+
+- Still Harbor is a permanent seventh system connected to Pelagos by one 34-fuel route.
+- The player discovers the system and route at Pelagos by comparing ordinary outbound flight plans.
+- Discovery uses the persistent navigation graph and survives reload.
+- Existing saves remain compatible, including saves currently docked at later-added permanent locations.
+- Crimson Helium and Veyrite use the existing dynamic-market and market-memory systems.
+- Keith T. Maxwell, Gunant, and Tayaln use the persistent contact state and hardened interaction dispatcher.
+- Still Harbor reuses existing contracts, repair, refueling, outfitting, cantina, travel, and persistence systems.
+- The restrained crimson regional treatment and lightweight station artwork use the established responsive containers.
+- Outward traffic is visible as environmental evidence, but Information Convergence and discovery of another Second Frontier system remain deliberately absent.
+- Modified static-file references use the `second-frontier-batch1` activation version.
+
+Technical verification completed:
+
+- JavaScript syntax across every loaded script
+- Referenced script and stylesheet presence
+- CSS brace and duplicate static HTML identifier checks
+- Git whitespace validation
+- Full 70-script DOM smoke test
+- Fresh-game startup and original Haven market/contact/contract behavior
+- Existing hardened save startup at Pelagos
+- First Frontier discovery graph through Calder's Drift, Red Mesa, and Pelagos
+- Still Harbor discovery, explicit route registration, and 34-fuel travel
+- Three permanent contacts and their saved conversation memories
+- Both regional commodities through the existing market
+- Still Harbor contract acceptance and completion
+- Save/reload while docked at Still Harbor
+- Return to Pelagos and restoration of First Frontier presentation
+
+Real-device verification still required:
+
+- Existing save on iPhone and iPad
+- Pelagos discovery action and travel-map layout
+- Still Harbor Station, Market, Contracts, Travel, Ship, and Cantina views
+- All three contacts
+- Buy/sell behavior for both gases
+- Close/reopen while docked at Still Harbor
+- Touch targets, scrolling, text readability, map geometry, and SVG containment
 
 The repository is the authority for exact implementation state. This document is the authority for where development should resume.
 

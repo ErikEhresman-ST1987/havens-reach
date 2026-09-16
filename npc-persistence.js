@@ -5,7 +5,8 @@
 const NPC_DATA = {
   mara: FIRST_FRONTIER_CONTACTS.mara,
   seli: FIRST_FRONTIER_CONTACTS.seli,
-  lena: FIRST_FRONTIER_CONTACTS.lena
+  lena: FIRST_FRONTIER_CONTACTS.lena,
+  ...SECOND_FRONTIER_CONTACTS
 };
 
 function ensureNpcState() {
@@ -30,7 +31,11 @@ function npcRelationshipLabel(value) {
 }
 
 function npcAtCurrentPort() {
-  return Object.entries(NPC_DATA).find(([, npc]) => npc.location === state.location);
+  return npcsAtCurrentPort()[0];
+}
+
+function npcsAtCurrentPort() {
+  return Object.entries(NPC_DATA).filter(([, npc]) => npc.location === state.location);
 }
 
 function npcCallbackText(id) {
@@ -56,6 +61,21 @@ function npcCallbackText(id) {
     if (npcState.memory.professionalOnly) return "Lena understands that you prefer to keep your dealings professional and uncomplicated.";
   }
 
+  if (id === "keithMaxwell") {
+    if (npcState.memory.listenedAtBar) return "Keith remembers that you were willing to listen without steering every conversation toward business.";
+    if (npcState.memory.askedAboutBelonging) return "Keith knows you understand that a useful place can become home before you notice it happening.";
+  }
+
+  if (id === "gunant") {
+    if (npcState.memory.askedHowItWorks) return "Gunant remembers that you asked how the old and new systems cooperate instead of asking why the station looks mismatched.";
+    if (npcState.memory.calledItHome) return "Gunant no longer needs to explain that Still Harbor is a home, not a posting he failed to leave.";
+  }
+
+  if (id === "tayaln") {
+    if (npcState.memory.learnedCargoIsHers) return "Tayaln knows you understand that she extracts and sells her own gas rather than representing someone else's operation.";
+    if (npcState.memory.respectedTerms) return "Tayaln remembers that you treated precise terms as professional courtesy, not needless formality.";
+  }
+
   return "They recognize you when you enter the port.";
 }
 
@@ -64,19 +84,20 @@ renderOverview = function() {
   ensureNpcState();
   baseRenderOverviewForNpcs();
 
-  const local = npcAtCurrentPort();
-  if (!local) return;
+  const locals = npcsAtCurrentPort();
+  if (!locals.length) return;
 
-  const [id, npc] = local;
-  const npcState = state.npcs[id];
-  const contactHtml = `
-    <article class="info-card">
-      <h3>Local Contact</h3>
-      <p><strong>${escapeHtml(npc.name)}</strong> — ${escapeHtml(npc.role)}</p>
-      <p class="muted small">Relationship: ${npcRelationshipLabel(npcState.relationship)}</p>
-      <p class="muted small">${escapeHtml(npcCallbackText(id))}</p>
-      <button class="secondary" type="button" onclick="openNpcInteraction('${id}')">${npcState.met ? "Talk" : "Meet"}</button>
-    </article>`;
+  const contactHtml = locals.map(([id, npc]) => {
+    const npcState = state.npcs[id];
+    return `
+      <article class="info-card">
+        <h3>Local Contact</h3>
+        <p><strong>${escapeHtml(npc.name)}</strong> — ${escapeHtml(npc.role)}</p>
+        <p class="muted small">Relationship: ${npcRelationshipLabel(npcState.relationship)}</p>
+        <p class="muted small">${escapeHtml(npcCallbackText(id))}</p>
+        <button class="secondary" type="button" onclick="openNpcInteraction('${id}')">${npcState.met ? "Talk" : "Meet"}</button>
+      </article>`;
+  }).join("");
 
   const grid = view.querySelector(".card-grid");
   if (grid) grid.insertAdjacentHTML("beforeend", contactHtml);

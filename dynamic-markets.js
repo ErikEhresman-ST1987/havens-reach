@@ -2,11 +2,22 @@
 // Market content is owned by world-data.js. This module owns the proven dynamic
 // behavior: persistent conditions, stock, pricing, buying/selling, and memory.
 
-const DYNAMIC_GOODS = FIRST_FRONTIER_MARKET_GOODS;
+const DYNAMIC_GOODS = {
+  ...FIRST_FRONTIER_MARKET_GOODS,
+  ...SECOND_FRONTIER_MARKET_GOODS
+};
 Object.assign(GAME_DATA.commodities, DYNAMIC_GOODS);
 
-const MARKET_CATEGORIES = FIRST_FRONTIER_MARKET_CATEGORIES;
-const PORT_MARKET_BASES = FIRST_FRONTIER_MARKET_BASES;
+const MARKET_CATEGORIES = [
+  ...FIRST_FRONTIER_MARKET_CATEGORIES,
+  ...SECOND_FRONTIER_MARKET_CATEGORIES.filter(category => !FIRST_FRONTIER_MARKET_CATEGORIES.includes(category))
+];
+const PORT_MARKET_BASES = Object.fromEntries(
+  Object.entries(FIRST_FRONTIER_MARKET_BASES).map(([systemId, catalog]) => [systemId, { ...catalog }])
+);
+Object.entries(SECOND_FRONTIER_MARKET_BASES).forEach(([systemId, catalog]) => {
+  PORT_MARKET_BASES[systemId] = { ...(PORT_MARKET_BASES[systemId] || {}), ...catalog };
+});
 
 const MARKET_CONDITIONS = {
   surplus: { label: "Surplus", multiplier: 0.75 },

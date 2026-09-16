@@ -84,6 +84,22 @@ const STATION_IDENTITIES = {
       <path d="M15 53c12-15 22-23 39-29" />
       <path d="M24 56c8-10 16-16 30-21" />
       <circle cx="54" cy="13" r="2.5" class="station-emblem-secondary" />`
+  },
+  stillHarbor: {
+    purpose: "Independent Gateway in the Crimson Expanse",
+    administration: "Still Harbor Dock Cooperative",
+    influence: "Gas miners • traders • prospectors • outward-bound independents",
+    arrival: "Everything looks borrowed from somewhere else. Everything works.",
+    region: "crimson-expanse",
+    accent: "#bd6774",
+    accent2: "#d2a76f",
+    tint: "rgba(151, 43, 62, 0.14)",
+    emblem: `
+      <path d="M10 35c8-6 16-8 22-8s14 2 22 8" />
+      <path d="M15 37v10h34V37" />
+      <path d="M22 27V17h20v10" class="station-emblem-secondary" />
+      <path d="M8 52h48" class="station-emblem-secondary" />
+      <circle cx="32" cy="17" r="3" />`
   }
 };
 
@@ -101,8 +117,9 @@ function stationEmblemSvg(id, compact = false) {
 
 function applyStationTheme() {
   const identity = stationIdentity();
-  if (!identity) return;
   const root = document.documentElement;
+  root.dataset.region = identity?.region || "first-frontier";
+  if (!identity) return;
   root.style.setProperty("--station-accent", identity.accent);
   root.style.setProperty("--station-accent-2", identity.accent2);
   root.style.setProperty("--station-tint", identity.tint);

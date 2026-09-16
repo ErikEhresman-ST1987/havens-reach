@@ -31,6 +31,7 @@ function npcOpportunityAvailable(id) {
   const npcState = state.npcs[id];
   if (!npcState?.met) return false;
   const record = state.npcOpportunities[id];
+  if (!record) return false;
   return Boolean(record.current) || state.tripCount - record.lastTrip >= 2;
 }
 

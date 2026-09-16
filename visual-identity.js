@@ -27,7 +27,10 @@ const COMMODITY_ICON_PATHS = {
 
   luxuries: `<path d="M20 5l11 8-4 14-7 6-7-6-4-14z"/><path d="M9 13h22M13 27l7-14 7 14" class="commodity-icon-accent"/>`,
   veylanTextiles: `<path d="M8 9h20l4 5-4 5 4 5-4 5H8l4-5-4-5 4-5z"/><path d="M13 9v20M19 9v20M25 9v20" class="commodity-icon-accent"/>`,
-  rareCollectibles: `<path d="M12 9h16l4 8-12 15L8 17z"/><path d="M12 9l8 23 8-23M8 17h24"/><circle cx="20" cy="7" r="2" class="commodity-icon-accent"/>`
+  rareCollectibles: `<path d="M12 9h16l4 8-12 15L8 17z"/><path d="M12 9l8 23 8-23M8 17h24"/><circle cx="20" cy="7" r="2" class="commodity-icon-accent"/>`,
+
+  crimsonHelium: `<path d="M11 10h18v22H11z"/><path d="M14 6h12v4M20 32v4"/><path d="M15 20c3-6 7-6 10 0-3 6-7 6-10 0z" class="commodity-icon-accent"/>`,
+  veyrite: `<path d="M20 5l10 8-3 15-7 7-7-7-3-15z"/><path d="M14 13h12M13 28l7-15 7 15" class="commodity-icon-accent"/>`
 };
 
 function commodityIconSvg(id, compact = false) {
@@ -160,6 +163,24 @@ const NPC_VISUAL_IDENTITIES = {
       <path d="M19 54c4-7 8-10 13-10s9 3 13 10" />
       <path d="M48 13c6 5 8 11 6 17M51 10c8 6 11 14 9 23" class="npc-mark-secondary" />
       <circle cx="54" cy="34" r="2.5" class="npc-mark-secondary" />`
+  },
+  keithMaxwell: {
+    accent: "#cb7d83",
+    accent2: "#d2a76f",
+    descriptor: "Still Harbor bartender",
+    mark: `<path d="M23 17c3-6 15-6 18 0v11c0 7-4 12-9 12s-9-5-9-12z"/><path d="M18 54c3-9 8-13 14-13s11 4 14 13"/><path d="M26 32c4 3 8 3 12 0" class="npc-mark-secondary"/><path d="M47 18h10M52 13v10" class="npc-mark-secondary"/>`
+  },
+  gunant: {
+    accent: "#af7880",
+    accent2: "#91a5ae",
+    descriptor: "Ruun dockmaster",
+    mark: `<path d="M20 18l7-8h10l7 8 2 17-8 10H26l-8-10z"/><path d="M24 27h4M36 27h4"/><path d="M25 55l4-11h7l4 11"/><path d="M12 48h13M39 48h13" class="npc-mark-secondary"/><path d="M13 44l-4 4 4 4M51 44l4 4-4 4" class="npc-mark-secondary"/>`
+  },
+  tayaln: {
+    accent: "#a98bd7",
+    accent2: "#cf7784",
+    descriptor: "Veylan gas miner",
+    mark: `<path d="M25 13c-5 7-6 17-3 25l10 9 10-9c3-8 2-18-3-25-4-5-10-5-14 0z"/><path d="M19 54c4-7 8-10 13-10s9 3 13 10"/><path d="M49 14v23M45 18h8M45 33h8" class="npc-mark-secondary"/><circle cx="49" cy="25" r="3" class="npc-mark-secondary"/>`
   }
 };
 

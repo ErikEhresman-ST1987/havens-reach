@@ -2,7 +2,11 @@ const GAME_DATA = {
   systems: {
     haven: FIRST_FRONTIER_SYSTEMS.haven,
     meridian: FIRST_FRONTIER_SYSTEMS.meridian,
-    prospect: FIRST_FRONTIER_SYSTEMS.prospect
+    prospect: FIRST_FRONTIER_SYSTEMS.prospect,
+    caldersDrift: FIRST_FRONTIER_SYSTEMS.caldersDrift,
+    redMesa: FIRST_FRONTIER_SYSTEMS.redMesa,
+    pelagos: FIRST_FRONTIER_SYSTEMS.pelagos,
+    stillHarbor: SECOND_FRONTIER_SYSTEMS.stillHarbor
   },
   commodities: {
     ore: { name: "Processed Ore" },

@@ -104,6 +104,33 @@ const STATION_ARRIVAL_SCENES = {
         <g stroke="#8dd8de" stroke-width="2" fill="none"><path d="M396 98V60"/><circle cx="396" cy="56" r="4" fill="#8dd8de"/><path d="M330 168v21M462 168v21"/><path d="M535 151c60-7 104-4 158 4" stroke-dasharray="4 6"/></g>
         <g stroke="#8f78c8" stroke-width="1.5" fill="none" opacity=".55"><path d="M104 181c122-22 244-20 375-3"/><path d="M541 177c82 11 158 8 247-9"/></g>
       </svg>`
+  },
+  stillHarbor: {
+    label: "CRIMSON EXPANSE ANCHORAGE",
+    caption: "Still Harbor • Outward gateway and independent provisioning port",
+    art: () => `
+      <svg class="station-scene still-harbor-scene" viewBox="0 0 900 220" role="img" aria-label="Still Harbor's mismatched but carefully maintained station sections sheltered within a dark crimson nebula" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="stillHarborSky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#090b13"/><stop offset=".58" stop-color="#2a111d"/><stop offset="1" stop-color="#4a1927"/></linearGradient>
+          <radialGradient id="crimsonCloud"><stop offset="0" stop-color="#9f3f55" stop-opacity=".34"/><stop offset="1" stop-color="#531a2a" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect width="900" height="220" fill="url(#stillHarborSky)"/>
+        <ellipse cx="675" cy="75" rx="260" ry="125" fill="url(#crimsonCloud)"/>
+        <g fill="#f6dce3" opacity=".65"><circle cx="72" cy="38" r="1"/><circle cx="184" cy="70" r="1"/><circle cx="311" cy="30" r="1"/><circle cx="728" cy="42" r="1"/><circle cx="832" cy="74" r="1"/></g>
+        <g fill="#0a1017" stroke="#bd6774" stroke-width="2">
+          <path d="M106 122h250l34 23-34 23H106l-31-23z"/>
+          <path d="M355 132h174l26 17-26 17H355z"/>
+          <path d="M529 113h104v55H529z"/>
+          <path d="M633 128h76l28 20-28 20h-76z"/>
+        </g>
+        <g fill="#101820" stroke="#d2a76f" stroke-width="2">
+          <path d="M171 122l20-31h72l18 31"/><path d="M405 132v-35h56v35"/><path d="M568 113V78h25v35"/>
+          <rect x="220" y="137" width="29" height="13" fill="#bd6774"/><rect x="266" y="137" width="29" height="13" fill="#d2a76f"/>
+        </g>
+        <g stroke="#7f8792" stroke-width="2" fill="none"><path d="M83 169h654"/><path d="M132 169v20M329 169v20M496 168v21M687 168v21"/><path d="M623 92h68l23 18"/></g>
+        <g fill="#d2a76f"><circle cx="752" cy="112" r="3"/><circle cx="786" cy="92" r="3"/><circle cx="824" cy="124" r="3"/></g>
+        <g stroke="#d2a76f" stroke-width="1.5" opacity=".52"><path d="M738 114l-52 18"/><path d="M775 96l-64 31"/><path d="M812 126l-74 20"/></g>
+      </svg>`
   }
 };
 

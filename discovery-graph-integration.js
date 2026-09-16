@@ -40,3 +40,12 @@ discoverPelagos = function discoverPelagosWithExplicitRoute() {
     discoverRoute("redMesa", "pelagos", "The verified survey vector establishes the direct outer route from Red Mesa Junction.");
   }
 };
+
+const discoverStillHarborBeforeGraphIntegration = discoverStillHarbor;
+discoverStillHarbor = function discoverStillHarborWithExplicitRoute() {
+  const alreadyKnown = isSystemKnown("stillHarbor");
+  discoverStillHarborBeforeGraphIntegration();
+  if (!alreadyKnown && isSystemKnown("stillHarbor")) {
+    discoverRoute("pelagos", "stillHarbor", "The compared flight plans establish the maintained corridor through the Crimson Expanse.");
+  }
+};

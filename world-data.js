@@ -62,7 +62,7 @@ const FIRST_FRONTIER_SYSTEMS = {
     name: "Pelagos Survey Anchorage",
     type: "Outer Survey Station",
     description: "An Elyri-led survey anchorage at the edge of dependable charts, quiet except for research craft, long-range scouts, and operators willing to haul what the station cannot make itself.",
-    neighbors: { redMesa: 31 },
+    neighbors: { redMesa: 31, stillHarbor: 34 },
     market: { ore: 35, food: 68, medicine: 64, machineParts: 91, luxuries: 118 },
     contracts: [
       { id: "pelagos-data", title: "Deep Survey Archive", destination: "prospect", reward: 880, cargo: {}, rep: 2, text: "Carry a protected survey archive inward to Prospect Reach for duplication and analysis." },
@@ -226,4 +226,116 @@ const FIRST_FRONTIER_MARKET_BASES = {
     machineParts: 89, sensorComponents: 78,
     luxuries: 116, rareCollectibles: 154
   }
+};
+
+// Second Frontier Batch 1 — one permanent gateway beyond the proven First Frontier.
+// These are content definitions only. Existing navigation, market, contract, NPC,
+// persistence, and rendering owners remain responsible for behavior.
+const SECOND_FRONTIER_SYSTEMS = {
+  stillHarbor: {
+    name: "Still Harbor",
+    type: "Second Frontier Gateway",
+    description: "A sprawling independent station sheltered within the Crimson Expanse, assembled from old hulls, improvised additions, and newer systems that somehow operate as one dependable port.",
+    neighbors: { pelagos: 34 },
+    market: {},
+    overviewCards: [
+      {
+        title: "A Working Gateway",
+        text: "Gas tanks, docking berths, trading galleries, repair crews, and outfitters accumulated around the original safe anchorage. The station looks improvised because it grew to meet real needs—not because anyone stopped maintaining it."
+      },
+      {
+        title: "Outbound Corridor",
+        text: "Ships with unfamiliar registry marks take on supplies for journeys longer than a local circuit, then depart along vectors that do not appear on your chart. Still Harbor is supporting traffic bound somewhere farther out."
+      }
+    ],
+    contracts: [
+      {
+        id: "still-helium-meridian",
+        title: "Crimson Helium Lot",
+        destination: "meridian",
+        reward: 1180,
+        cargo: { crimsonHelium: 3 },
+        rep: 2,
+        text: "Carry a routine industrial-gas shipment inward from Still Harbor to Meridian Exchange."
+      },
+      {
+        id: "still-survey-support",
+        title: "Prospecting Support Canisters",
+        destination: "pelagos",
+        reward: 720,
+        cargo: { crimsonHelium: 1, machineParts: 1 },
+        rep: 1,
+        text: "Return sealed gas samples and field-service components to Pelagos for a survey team preparing another outward pass."
+      },
+      {
+        id: "still-recovery-rig",
+        title: "Recovery Rig Transfer",
+        destination: "redMesa",
+        reward: 1260,
+        cargo: { miningComponents: 2 },
+        rep: 2,
+        text: "Move two compact recovery rigs inward to a Red Mesa freight cooperative for overhaul."
+      }
+    ]
+  }
+};
+
+const SECOND_FRONTIER_ADDITIONAL_CONTRACTS = {
+  pelagos: [
+    {
+      id: "pelagos-still-harbor",
+      title: "Gateway Provisioning Run",
+      destination: "stillHarbor",
+      reward: 760,
+      cargo: { food: 1, medicine: 1 },
+      rep: 1,
+      text: "Carry ordinary provisions through the Crimson Expanse to Still Harbor's busy docking population."
+    }
+  ]
+};
+
+const SECOND_FRONTIER_CONTACTS = {
+  keithMaxwell: {
+    name: "Keith T. Maxwell",
+    role: "Bartender",
+    location: "stillHarbor",
+    intro: "Keith T. Maxwell works the room without appearing to manage it—remembering a miner's bad week, catching a courier's joke, and giving a quiet newcomer space to decide whether to talk. Still Harbor is the first place he found where belonging and being useful became the same thing."
+  },
+  gunant: {
+    name: "Gunant",
+    role: "Ruun Dockmaster",
+    location: "stillHarbor",
+    intro: "Gunant has kept Still Harbor's mismatched docking systems working since its earliest days. He is crusty about careless berthing and unexpectedly patient with crews who are honestly trying. He speaks of the station's oldest improvised joints with the familiarity of someone describing rooms in his own home."
+  },
+  tayaln: {
+    name: "Tayaln",
+    role: "Veylan Gas Miner",
+    location: "stillHarbor",
+    intro: "Tayaln's precise presentation suggests a broker until a loading supervisor asks where she wants her latest gas shipment stored. She answers without hesitation: the product is hers, extracted by her equipment and sold on terms she negotiated herself."
+  }
+};
+
+const SECOND_FRONTIER_MARKET_GOODS = {
+  crimsonHelium: { name: "Crimson Helium", category: "Industrial Gases", finite: false },
+  veyrite: { name: "Veyrite", category: "Industrial Gases", finite: true }
+};
+
+const SECOND_FRONTIER_MARKET_CATEGORIES = ["Industrial Gases"];
+
+const SECOND_FRONTIER_MARKET_BASES = {
+  stillHarbor: {
+    food: 74,
+    preservedProduce: 94,
+    medicine: 82,
+    antibiotics: 112,
+    machineParts: 83,
+    miningComponents: 106,
+    sensorComponents: 119,
+    luxuries: 132,
+    crimsonHelium: 32,
+    veyrite: 158
+  },
+  meridian: { crimsonHelium: 59, veyrite: 238 },
+  redMesa: { crimsonHelium: 65 },
+  pelagos: { crimsonHelium: 51, veyrite: 214 }
 };

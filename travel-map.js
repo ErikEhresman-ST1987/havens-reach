@@ -8,7 +8,8 @@ const TRAVEL_MAP_POSITIONS = {
   prospect: [42, 68],
   caldersDrift: [59, 30],
   redMesa: [76, 66],
-  pelagos: [92, 38]
+  pelagos: [88, 30],
+  stillHarbor: [92, 82]
 };
 
 let travelMapSelectedSystem = null;
@@ -26,7 +27,7 @@ function travelMapLayoutPositions(knownIds) {
   const isPhone = window.matchMedia?.("(max-width: 680px)")?.matches;
   if (!isPhone) return TRAVEL_MAP_POSITIONS;
 
-  const preferredOrder = ["haven", "meridian", "prospect", "caldersDrift", "redMesa", "pelagos"];
+  const preferredOrder = ["haven", "meridian", "prospect", "caldersDrift", "redMesa", "pelagos", "stillHarbor"];
   const ordered = [
     ...preferredOrder.filter(id => knownIds.includes(id)),
     ...knownIds.filter(id => !preferredOrder.includes(id))
