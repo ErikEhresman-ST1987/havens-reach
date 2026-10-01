@@ -2,128 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#081018">
-  <title>Haven's Reach</title>
-  <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="station-arrival-visuals.css">
-  <link rel="stylesheet" href="travel-map.css">
-  <link rel="stylesheet" href="commodity-icons.css">
-  <link rel="stylesheet" href="npc-visual-identity.css">
-  <link rel="stylesheet" href="transient-field-site.css">
-  <link rel="stylesheet" href="phone-layout.css">
-  <link rel="stylesheet" href="log-quick-access.css">
-  <link rel="stylesheet" href="field-network.css">
-  <link rel="stylesheet" href="station-project-clarity.css">
-  <link rel="stylesheet" href="captains-briefing.css">
-  <link rel="stylesheet" href="operator-customization.css">
-  <link rel="stylesheet" href="npc-population.css">
-  <link rel="stylesheet" href="still-harbor.css">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070b12">
+  <title>Haven's Reach — Wayfarer Graphical Proof</title>
+  <link rel="stylesheet" href="graphical.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <p class="eyebrow">INDEPENDENT OPERATOR CONSOLE</p>
-      <h1>Haven's Reach</h1>
-    </div>
-    <button id="resetButton" class="danger secondary">New Game</button>
-  </header>
-
-  <main class="app-shell">
-    <section class="status-grid" aria-label="Ship status">
-      <div class="status-card"><span>Credits</span><strong id="credits">0</strong></div>
-      <div class="status-card"><span>Fuel</span><strong id="fuel">0 / 0</strong></div>
-      <div class="status-card"><span>Hull</span><strong id="hull">0%</strong></div>
-      <div class="status-card"><span>Cargo</span><strong id="cargoUsed">0 / 0</strong></div>
-    </section>
-
-    <section class="panel hero-panel">
-      <div>
-        <p class="eyebrow">CURRENT LOCATION</p>
-        <h2 id="locationName"></h2>
-        <p id="locationDescription" class="muted"></p>
+  <main id="game-shell">
+    <section id="scene-wrap" aria-label="Wayfarer command deck at Haven">
+      <div id="scene"></div>
+      <div id="location-chip"><strong>WAYFARER</strong><span>Haven Orbit</span></div>
+      <div id="interaction-label" aria-live="polite"></div>
+      <button class="semantic-console" data-console="operations" type="button">Operations / Cargo</button>
+      <button class="semantic-console" data-console="navigation" type="button">Navigation / Helm</button>
+      <button class="semantic-console" data-console="communications" type="button">Communications</button>
+      <button id="semantic-engineering" class="semantic-console" data-console="engineering" type="button">Engineering</button>
+      <div id="startup-error" hidden>
+        <div><h1>Wayfarer display unavailable</h1><p>The graphical scene could not be loaded. Your saved game state has not been changed.</p></div>
       </div>
-      <div class="ship-card">
-        <span class="ship-mark" aria-hidden="true">◇</span>
-        <div>
-          <strong id="shipName"></strong>
-          <p id="shipDetails" class="muted small"></p>
-        </div>
-      </div>
-    </section>
-
-    <nav class="tabs" aria-label="Operator sections">
-      <button class="tab active" data-view="overview">Station</button>
-      <button class="tab" data-view="market">Market</button>
-      <button class="tab" data-view="contracts">Contracts</button>
-      <button class="tab" data-view="travel">Travel</button>
-      <button class="tab" data-view="ship">Ship</button>
-    </nav>
-
-    <section id="view" class="panel view-panel" aria-live="polite"></section>
-
-    <section class="panel log-panel">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">CAPTAIN'S LOG</p>
-          <h2>Recent Events</h2>
-        </div>
-      </div>
-      <div id="eventLog" class="event-log"></div>
     </section>
   </main>
-
-  <dialog id="encounterDialog">
-    <form method="dialog" class="encounter-card">
-      <p class="eyebrow">OPERATOR ENCOUNTER</p>
-      <h2 id="encounterTitle"></h2>
-      <p id="encounterText"></p>
-      <div id="encounterChoices" class="button-stack"></div>
-    </form>
-  </dialog>
-
-  <script src="game-data.js"></script>
-  <script src="captains-briefing.js"></script>
-  <script src="app.js"></script>
-  <script src="ship-upgrades.js"></script>
-  <script src="market-memory.js"></script>
-  <script src="contract-refresh.js"></script>
-  <script src="richer-encounters.js"></script>
-  <script src="npc-persistence.js"></script>
-  <script src="cantina-rumors.js"></script>
-  <script src="frontier-expansion.js"></script>
-  <script src="frontier-identity.js"></script>
-  <script src="career-contracts.js"></script>
-  <script src="station-repairs.js"></script>
-  <script src="mission-depth.js"></script>
-  <script src="progressive-discovery.js"></script>
-  <script src="dynamic-markets.js"></script>
-  <script src="npc-opportunities.js"></script>
-  <script src="trade-readability.js"></script>
-  <script src="npc-opportunity-signals.js"></script>
-  <script src="smuggling-contracts.js"></script>
-  <script src="station-identity.js"></script>
-  <script src="ship-chassis.js"></script>
-  <script src="seli-private-freight.js"></script>
-  <script src="contract-variety.js"></script>
-  <script src="content-depth.js"></script>
-  <script src="draak-freight-retrofit.js"></script>
-  <script src="contact-visibility.js"></script>
-  <script src="station-arrival-visuals.js"></script>
-  <script src="travel-map.js"></script>
-  <script src="visual-identity.js"></script>
-  <script src="transient-field.js"></script>
-  <script src="log-quick-access.js"></script>
-  <script src="field-network.js"></script>
-  <script src="field-network-compat.js"></script>
-  <script src="field-network-renewal.js"></script>
-  <script src="haven-station-project.js"></script>
-  <script src="wayfarer-refit.js"></script>
-  <script src="station-project-clarity.js"></script>
-  <script src="operator-customization.js"></script>
-  <script src="people-conversations.js"></script>
-  <script src="station-development.js"></script>
-  <script src="still-harbor.js"></script>
-  <script src="bootstrap.js"></script>
+  <div id="focus-backdrop" hidden>
+    <section id="engineering-panel" role="dialog" aria-modal="true" aria-labelledby="engineering-title">
+      <button id="close-panel" class="close" type="button" aria-label="Close Engineering">×</button>
+      <p class="eyebrow">WAYFARER / ENGINEERING</p>
+      <h1 id="engineering-title">Ship Condition</h1>
+      <div class="readout"><span>Hull integrity</span><strong id="hull-value">—</strong></div>
+      <div class="readout"><span>Available credits</span><strong id="credits-value">—</strong></div>
+      <p id="repair-copy"></p>
+      <button id="repair-button" class="primary" type="button">Repair Hull</button>
+    </section>
+  </div>
+  <script src="vendor/pixi.min.js"></script>
+  <script src="game-state.js"></script>
+  <script src="wayfarer-scene.js"></script>
+  <script src="graphical-app.js"></script>
 </body>
 </html>
