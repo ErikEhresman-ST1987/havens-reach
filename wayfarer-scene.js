@@ -3,7 +3,7 @@
   const DESIGN_W = 1536, DESIGN_H = 1024;
   const VIEWPORT_CROP = { x: 160, y: 72, w: 1230, h: 463 };
   const VIEWPORT_POLY = [174,82, 1350,82, 1380,522, 170,522];
-  let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, elapsed=0;
+  let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, elapsed=0, cueElapsed=0, cueLayer=null;
   const hotspots=[
     {id:'operations',label:'Operations / Cargo',x:248,y:520,w:210,h:190},
     {id:'navigation',label:'Navigation / Helm',x:520,y:520,w:460,h:245},
@@ -20,6 +20,17 @@
     g.on('pointertap',()=>request(def.id));
     if(def.id==='engineering') engineeringHotspot=g;
     return g;
+  }
+  function addDiscoveryCues(){
+    cueLayer=new PIXI.Container();
+    hotspots.forEach((def)=>{
+      const pad=10, cue=new PIXI.Graphics();
+      cue.roundRect(def.x-pad,def.y-pad,def.w+pad*2,def.h+pad*2,18)
+        .fill({color:0xf0b35c,alpha:.025})
+        .stroke({color:0xf0b35c,alpha:.30,width:3});
+      cueLayer.addChild(cue);
+    });
+    app.stage.addChild(cueLayer);
   }
   function updateCondition(state){
     if(!engineeringLamp) return;
@@ -40,15 +51,23 @@
     const deck=new PIXI.Sprite(deckTexture); deck.width=DESIGN_W; deck.height=DESIGN_H; app.stage.addChild(deck);
     engineeringLamp=new PIXI.Graphics(); app.stage.addChild(engineeringLamp);
     hotspots.forEach((def)=>app.stage.addChild(makeHotspot(def)));
+    if(!matchMedia('(prefers-reduced-motion: reduce)').matches) addDiscoveryCues();
     updateCondition(window.HRState.get()); unsubscribe=window.HRState.subscribe(updateCondition);
     app.ticker.add((ticker)=>{
+      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(cueLayer){
+        cueElapsed+=ticker.deltaMS;
+        const hold=1200, fade=1600;
+        cueLayer.alpha=cueElapsed<=hold?1:Math.max(0,1-(cueElapsed-hold)/fade);
+        if(cueElapsed>=hold+fade){ cueLayer.destroy({children:true}); cueLayer=null; }
+      }
       const state=window.HRState.get();
-      if(state.ship.hull>=state.ship.hullMax||matchMedia('(prefers-reduced-motion: reduce)').matches){ if(engineeringLamp) engineeringLamp.alpha=1; return; }
+      if(state.ship.hull>=state.ship.hullMax||reduced){ if(engineeringLamp) engineeringLamp.alpha=1; return; }
       elapsed+=ticker.deltaMS; if(engineeringLamp) engineeringLamp.alpha=.82+Math.sin(elapsed/720)*.12;
     });
   }
   async function destroy(){
-    if(unsubscribe) unsubscribe(); unsubscribe=null; engineeringLamp=null; engineeringHotspot=null; elapsed=0;
+    if(unsubscribe) unsubscribe(); unsubscribe=null; engineeringLamp=null; engineeringHotspot=null; cueLayer=null; elapsed=0; cueElapsed=0;
     if(app){ app.destroy(true,{children:true}); app=null; }
     if(host) host.replaceChildren();
   }
