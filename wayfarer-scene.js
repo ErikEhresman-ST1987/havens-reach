@@ -23,12 +23,16 @@
   }
   function addDiscoveryCues(){
     cueLayer=new PIXI.Container();
-    hotspots.forEach((def)=>{
-      const pad=10, cue=new PIXI.Graphics();
-      cue.roundRect(def.x-pad,def.y-pad,def.w+pad*2,def.h+pad*2,18)
-        .fill({color:0xf0b35c,alpha:.025})
-        .stroke({color:0xf0b35c,alpha:.30,width:3});
-      cueLayer.addChild(cue);
+    hotspots.forEach((def,index)=>{
+      const cx=def.x+def.w/2, cy=def.y+def.h/2;
+      const glow=new PIXI.Graphics();
+      glow.ellipse(cx,cy,def.w*.62,def.h*.58).fill({color:0xf2a84a,alpha:.12});
+      glow.ellipse(cx,cy,def.w*.50,def.h*.46).fill({color:0x78cfe0,alpha:.08});
+      glow.roundRect(def.x-8,def.y-8,def.w+16,def.h+16,18)
+        .stroke({color:0xf3b45e,alpha:.62,width:4});
+      glow.alpha=0;
+      glow._cueDelay=index*180;
+      cueLayer.addChild(glow);
     });
     app.stage.addChild(cueLayer);
   }
@@ -57,9 +61,14 @@
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(cueLayer){
         cueElapsed+=ticker.deltaMS;
-        const hold=1200, fade=1600;
-        cueLayer.alpha=cueElapsed<=hold?1:Math.max(0,1-(cueElapsed-hold)/fade);
-        if(cueElapsed>=hold+fade){ cueLayer.destroy({children:true}); cueLayer=null; }
+        const fadeIn=650, hold=2600, fadeOut=2200, total=fadeIn+hold+fadeOut+540;
+        cueLayer.children.forEach((cue)=>{
+          const t=Math.max(0,cueElapsed-cue._cueDelay);
+          if(t<fadeIn) cue.alpha=t/fadeIn;
+          else if(t<fadeIn+hold) cue.alpha=.92+Math.sin(t/520)*.08;
+          else cue.alpha=Math.max(0,1-(t-fadeIn-hold)/fadeOut);
+        });
+        if(cueElapsed>=total){ cueLayer.destroy({children:true}); cueLayer=null; }
       }
       const state=window.HRState.get();
       if(state.ship.hull>=state.ship.hullMax||reduced){ if(engineeringLamp) engineeringLamp.alpha=1; return; }
