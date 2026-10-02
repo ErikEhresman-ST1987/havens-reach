@@ -33,7 +33,7 @@
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function notify() { const current = snapshot(); listeners.forEach((listener) => listener(current)); }
   function beginTravel(destination) {
-    if (!LOCATIONS.has(destination) || destination === state.location || state.condition === 'traveling') return { ok: false, state: snapshot() };
+    if (!LOCATIONS.has(destination) || destination === state.location || state.condition !== 'stationary') return { ok: false, state: snapshot() };
     state = { ...state, condition: 'traveling' };
     notify();
     return { ok: true, origin: state.location, destination, state: snapshot() };
@@ -50,6 +50,18 @@
     notify();
     return { ok: true, state: snapshot() };
   }
+  function dock() {
+    if (state.condition !== 'stationary') return { ok: false, state: snapshot() };
+    state = { ...state, condition: 'docked' };
+    save(); notify();
+    return { ok: true, state: snapshot() };
+  }
+  function undock() {
+    if (state.condition !== 'docked') return { ok: false, state: snapshot() };
+    state = { ...state, condition: 'stationary' };
+    save(); notify();
+    return { ok: true, state: snapshot() };
+  }
   function repairQuote() {
     const missing = Math.max(0, state.ship.hullMax - state.ship.hull);
     const affordablePoints = Math.floor(state.credits / REPAIR_COST_PER_POINT);
@@ -64,5 +76,5 @@
     return { ok: true, quote, state: snapshot() };
   }
   function subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, repairQuote, repairHull, subscribe, save };
+  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, dock, undock, repairQuote, repairHull, subscribe, save };
 })();
