@@ -3,7 +3,10 @@
   const DESIGN_W = 1536, DESIGN_H = 1024;
   const VIEWPORT_CROP = { x: 160, y: 72, w: 1230, h: 463 };
   const VIEWPORT_POLY = [174,82, 1350,82, 1380,522, 170,522];
-  const VIEWPORT_ASSETS = { haven:'assets/haven-viewport.webp', meridian:'assets/meridian-viewport.webp' };
+  const VIEWPORT_ASSETS = {
+    haven:{stationary:'assets/haven-viewport.webp',docked:'assets/haven-docked-viewport.webp'},
+    meridian:{stationary:'assets/meridian-viewport.webp',docked:'assets/meridian-docked-viewport.webp'}
+  };
   let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, viewportSprite=null, elapsed=0, cueElapsed=0, cueLayer=null, travelLayer=null, travelResolve=null;
   const hotspots=[
     {id:'operations',label:'Operations / Cargo',x:248,y:520,w:210,h:190},
@@ -44,7 +47,7 @@
   }
   async function updateViewport(state){
     if(!viewportSprite) return;
-    const asset=VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven;
+    const family=VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven, asset=family[state.condition]||family.stationary;
     viewportSprite.texture=await PIXI.Assets.load(asset);
   }
   async function mount(target){
@@ -53,7 +56,7 @@
     await app.init({width:DESIGN_W,height:DESIGN_H,background:'#070b12',antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,2)});
     app.canvas.setAttribute('aria-hidden','true'); host.replaceChildren(app.canvas);
     const state=window.HRState.get();
-    const [deckTexture,viewportTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load(VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven)]);
+    const [deckTexture,viewportTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load((VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven)[state.condition]||(VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven).stationary)]);
     viewportSprite=new PIXI.Sprite(viewportTexture); viewportSprite.position.set(VIEWPORT_CROP.x,VIEWPORT_CROP.y); viewportSprite.width=VIEWPORT_CROP.w; viewportSprite.height=VIEWPORT_CROP.h;
     const viewportMask=new PIXI.Graphics(); viewportMask.poly(VIEWPORT_POLY).fill(0xffffff); viewportSprite.mask=viewportMask; app.stage.addChild(viewportSprite,viewportMask);
     const deck=new PIXI.Sprite(deckTexture); deck.width=DESIGN_W; deck.height=DESIGN_H; app.stage.addChild(deck);
@@ -108,10 +111,35 @@
       requestAnimationFrame(frame);
     });
   }
+  function showDocking(mode,location){
+    return new Promise((resolve)=>{
+      if(!app){resolve();return;}
+      const layer=new PIXI.Container(), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const veil=new PIXI.Graphics(); veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x050a0f,alpha:.72});
+      const guide=new PIXI.Graphics();
+      guide.moveTo(360,250).lineTo(650,512).lineTo(360,774).stroke({color:0x78cfe0,width:3,alpha:.6});
+      guide.moveTo(1176,250).lineTo(886,512).lineTo(1176,774).stroke({color:0x78cfe0,width:3,alpha:.6});
+      const label=mode==='dock'?'DOCKING APPROACH':'UNDOCKING';
+      const place=location==='haven'?'HAVEN':'MERIDIAN EXCHANGE';
+      const title=new PIXI.Text({text:label,style:{fontFamily:'Arial, sans-serif',fontSize:30,fill:0xefb25d,letterSpacing:4}});
+      title.anchor.set(.5); title.position.set(DESIGN_W/2,430);
+      const sub=new PIXI.Text({text:place+'  •  WAYFARER',style:{fontFamily:'Arial, sans-serif',fontSize:20,fill:0xb9dce1,letterSpacing:2}});
+      sub.anchor.set(.5); sub.position.set(DESIGN_W/2,485);
+      layer.addChild(veil,guide,title,sub); app.stage.addChild(layer);
+      const duration=reduced?700:2200,start=performance.now();
+      function frame(now){
+        const t=Math.min(1,(now-start)/duration);
+        guide.alpha=.45+.35*Math.sin(t*Math.PI);
+        layer.alpha=t<.15?t/.15:t>.82?(1-t)/.18:1;
+        if(t<1) requestAnimationFrame(frame); else {layer.destroy({children:true});resolve();}
+      }
+      requestAnimationFrame(frame);
+    });
+  }
   async function destroy(){
     if(unsubscribe) unsubscribe(); unsubscribe=null; if(travelResolve){travelResolve();travelResolve=null;} if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;} engineeringLamp=null; engineeringHotspot=null; viewportSprite=null; cueLayer=null; elapsed=0; cueElapsed=0;
     if(app){ app.destroy(true,{children:true}); app=null; }
     if(host) host.replaceChildren();
   }
-  window.WayfarerScene={mount,destroy,showTravel};
+  window.WayfarerScene={mount,destroy,showTravel,showDocking};
 })();
