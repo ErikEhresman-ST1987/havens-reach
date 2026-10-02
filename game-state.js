@@ -32,10 +32,22 @@
   function snapshot() { return typeof structuredClone === 'function' ? structuredClone(state) : JSON.parse(JSON.stringify(state)); }
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function notify() { const current = snapshot(); listeners.forEach((listener) => listener(current)); }
-  function setLocation(location) {
-    if (!LOCATIONS.has(location) || location === state.location) return { ok: false, state: snapshot() };
-    state = { ...state, location };
+  function beginTravel(destination) {
+    if (!LOCATIONS.has(destination) || destination === state.location || state.condition === 'traveling') return { ok: false, state: snapshot() };
+    state = { ...state, condition: 'traveling' };
+    notify();
+    return { ok: true, origin: state.location, destination, state: snapshot() };
+  }
+  function completeTravel(destination) {
+    if (!LOCATIONS.has(destination) || state.condition !== 'traveling') return { ok: false, state: snapshot() };
+    state = { ...state, location: destination, condition: 'stationary' };
     save(); notify();
+    return { ok: true, state: snapshot() };
+  }
+  function cancelTravel() {
+    if (state.condition !== 'traveling') return { ok: false, state: snapshot() };
+    state = { ...state, condition: 'stationary' };
+    notify();
     return { ok: true, state: snapshot() };
   }
   function repairQuote() {
@@ -52,5 +64,5 @@
     return { ok: true, quote, state: snapshot() };
   }
   function subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-  window.HRState = { get: snapshot, setLocation, repairQuote, repairHull, subscribe, save };
+  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, repairQuote, repairHull, subscribe, save };
 })();
