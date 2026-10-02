@@ -3,6 +3,7 @@
   const STORAGE_KEY = 'havensReachGraphicalProofV1';
   const DATA_VERSION = 1;
   const REPAIR_COST_PER_POINT = 10;
+  const LOCATIONS = new Set(['haven','meridian']);
   const freshState = () => ({
     app: 'havens-reach-graphical', dataVersion: DATA_VERSION,
     location: 'haven', operatorLocation: 'aboard', condition: 'stationary', credits: 700,
@@ -10,7 +11,7 @@
   });
   function validState(c) {
     return Boolean(c && c.app === 'havens-reach-graphical' && c.dataVersion === DATA_VERSION &&
-      c.location === 'haven' && c.operatorLocation === 'aboard' &&
+      LOCATIONS.has(c.location) && c.operatorLocation === 'aboard' &&
       Number.isFinite(c.credits) && c.credits >= 0 && c.ship && c.ship.id === 'wayfarer' &&
       Number.isFinite(c.ship.hull) && Number.isFinite(c.ship.hullMax) &&
       c.ship.hull >= 0 && c.ship.hull <= c.ship.hullMax);
@@ -31,6 +32,12 @@
   function snapshot() { return typeof structuredClone === 'function' ? structuredClone(state) : JSON.parse(JSON.stringify(state)); }
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function notify() { const current = snapshot(); listeners.forEach((listener) => listener(current)); }
+  function setLocation(location) {
+    if (!LOCATIONS.has(location) || location === state.location) return { ok: false, state: snapshot() };
+    state = { ...state, location };
+    save(); notify();
+    return { ok: true, state: snapshot() };
+  }
   function repairQuote() {
     const missing = Math.max(0, state.ship.hullMax - state.ship.hull);
     const affordablePoints = Math.floor(state.credits / REPAIR_COST_PER_POINT);
@@ -39,11 +46,11 @@
   }
   function repairHull() {
     const quote = repairQuote();
-    if (!quote.canRepair) return { ok: false, quote };
+    if (state.location !== 'haven' || !quote.canRepair) return { ok: false, quote };
     state = { ...state, credits: state.credits - quote.cost, ship: { ...state.ship, hull: state.ship.hull + quote.repairPoints } };
     save(); notify();
     return { ok: true, quote, state: snapshot() };
   }
   function subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-  window.HRState = { get: snapshot, repairQuote, repairHull, subscribe, save };
+  window.HRState = { get: snapshot, setLocation, repairQuote, repairHull, subscribe, save };
 })();
