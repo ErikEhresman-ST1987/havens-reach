@@ -9,28 +9,36 @@
 </head>
 <body>
   <main id="game-shell">
-    <section id="scene-wrap" aria-label="Wayfarer command deck at Haven">
+    <section id="scene-wrap" aria-label="Wayfarer command deck">
       <div id="scene"></div>
-      <div id="location-chip"><strong>WAYFARER</strong><span>Haven Orbit</span></div>
+      <div id="location-chip"><strong>WAYFARER</strong><span id="location-name">Haven Orbit</span></div>
       <div id="interaction-label" aria-live="polite"></div>
       <button class="semantic-console" data-console="operations" type="button">Operations / Cargo</button>
-      <button class="semantic-console" data-console="navigation" type="button">Navigation / Helm</button>
+      <button id="semantic-navigation" class="semantic-console" data-console="navigation" type="button">Navigation / Helm</button>
       <button class="semantic-console" data-console="communications" type="button">Communications</button>
       <button id="semantic-engineering" class="semantic-console" data-console="engineering" type="button">Engineering</button>
-      <div id="startup-error" hidden>
-        <div><h1>Wayfarer display unavailable</h1><p>The graphical scene could not be loaded. Your saved game state has not been changed.</p></div>
-      </div>
+      <div id="startup-error" hidden><div><h1>Wayfarer display unavailable</h1><p>The graphical scene could not be loaded. Your saved game state has not been changed.</p></div></div>
     </section>
   </main>
   <div id="focus-backdrop" hidden>
-    <section id="engineering-panel" role="dialog" aria-modal="true" aria-labelledby="engineering-title">
-      <button id="close-panel" class="close" type="button" aria-label="Close Engineering">×</button>
+    <section id="engineering-panel" class="focus-panel" role="dialog" aria-modal="true" aria-labelledby="engineering-title">
+      <button id="close-engineering" class="close" type="button" aria-label="Close Engineering">×</button>
       <p class="eyebrow">WAYFARER / ENGINEERING</p>
       <h1 id="engineering-title">Ship Condition</h1>
       <div class="readout"><span>Hull integrity</span><strong id="hull-value">—</strong></div>
       <div class="readout"><span>Available credits</span><strong id="credits-value">—</strong></div>
       <p id="repair-copy"></p>
       <button id="repair-button" class="primary" type="button">Repair Hull</button>
+    </section>
+    <section id="navigation-panel" class="focus-panel" role="dialog" aria-modal="true" aria-labelledby="navigation-title" hidden>
+      <button id="close-navigation" class="close" type="button" aria-label="Close Navigation">×</button>
+      <p class="eyebrow">WAYFARER / NAVIGATION</p>
+      <h1 id="navigation-title">Destination</h1>
+      <p id="navigation-copy">Select a known destination.</p>
+      <div class="destination-list">
+        <button class="destination" data-destination="haven" type="button"><strong>Haven</strong><span>Homeworld orbit</span></button>
+        <button class="destination" data-destination="meridian" type="button"><strong>Meridian Exchange</strong><span>Commercial hub</span></button>
+      </div>
     </section>
   </div>
   <script src="vendor/pixi.min.js"></script>
