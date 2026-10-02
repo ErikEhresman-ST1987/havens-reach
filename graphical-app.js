@@ -5,10 +5,15 @@
     closeNavigationButton=document.getElementById('close-navigation'), repairButton=document.getElementById('repair-button'),
     hullValue=document.getElementById('hull-value'), creditsValue=document.getElementById('credits-value'),
     repairCopy=document.getElementById('repair-copy'), navigationCopy=document.getElementById('navigation-copy'),
-    locationName=document.getElementById('location-name'), sceneHost=document.getElementById('scene');
+    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), sceneHost=document.getElementById('scene');
   const LOCATION_NAMES={haven:'Haven Orbit',meridian:'Meridian Exchange'};
-  let activePanel=null, travelInProgress=false;
-  function renderLocation(state){ locationName.textContent=LOCATION_NAMES[state.location]||state.location; }
+  let activePanel=null, travelInProgress=false, dockingInProgress=false;
+  function renderLocation(state){
+    const base=LOCATION_NAMES[state.location]||state.location;
+    locationName.textContent=state.condition==='docked'?base+' — Docked':base;
+    dockButton.textContent=state.condition==='docked'?'Undock':'Dock';
+    dockButton.disabled=travelInProgress||dockingInProgress||!['stationary','docked'].includes(state.condition);
+  }
   function renderEngineering(){
     const state=window.HRState.get(), quote=window.HRState.repairQuote();
     hullValue.textContent=`${state.ship.hull}%`; creditsValue.textContent=`${state.credits} cr`;
@@ -35,7 +40,7 @@
     activePanel=null; document.getElementById(focusId).focus({preventScroll:true});
   }
   function consoleIntent(id){
-    if(travelInProgress) return;
+    if(travelInProgress||dockingInProgress) return;
     if(id==='engineering'||id==='navigation'){ openPanel(id); return; }
     const names={operations:'Operations / Cargo',communications:'Communications'};
     const label=document.getElementById('interaction-label'); label.textContent=`${names[id]} — not active in this proof`;
@@ -61,7 +66,18 @@
       window.HRState.cancelTravel();
     } finally { travelInProgress=false; renderLocation(window.HRState.get()); }
   }));
-  window.HRState.subscribe((state)=>{ if(!travelInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
+  dockButton.addEventListener('click',async()=>{
+    if(travelInProgress||dockingInProgress) return;
+    const before=window.HRState.get(), mode=before.condition==='docked'?'undock':'dock';
+    if(!['stationary','docked'].includes(before.condition)) return;
+    dockingInProgress=true; renderLocation(before); locationName.textContent=mode==='dock'?'Docking…':'Undocking…';
+    try {
+      await window.WayfarerScene.showDocking(mode,before.location);
+      if(mode==='dock') window.HRState.dock(); else window.HRState.undock();
+    } catch(error){ console.error('Docking presentation failed.',error); }
+    finally { dockingInProgress=false; renderLocation(window.HRState.get()); }
+  });
+  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
   async function start(){
     try { renderLocation(window.HRState.get()); await window.WayfarerScene.mount(sceneHost); document.body.classList.add('ready'); }
     catch(error){ console.error('Wayfarer graphical proof failed to start.',error); document.getElementById('startup-error').hidden=false; }
