@@ -7,7 +7,7 @@
     repairCopy=document.getElementById('repair-copy'), navigationCopy=document.getElementById('navigation-copy'),
     locationName=document.getElementById('location-name'), sceneHost=document.getElementById('scene');
   const LOCATION_NAMES={haven:'Haven Orbit',meridian:'Meridian Exchange'};
-  let activePanel=null;
+  let activePanel=null, travelInProgress=false;
   function renderLocation(state){ locationName.textContent=LOCATION_NAMES[state.location]||state.location; }
   function renderEngineering(){
     const state=window.HRState.get(), quote=window.HRState.repairQuote();
@@ -35,6 +35,7 @@
     activePanel=null; document.getElementById(focusId).focus({preventScroll:true});
   }
   function consoleIntent(id){
+    if(travelInProgress) return;
     if(id==='engineering'||id==='navigation'){ openPanel(id); return; }
     const names={operations:'Operations / Cargo',communications:'Communications'};
     const label=document.getElementById('interaction-label'); label.textContent=`${names[id]} — not active in this proof`;
@@ -46,11 +47,21 @@
   backdrop.addEventListener('click',(event)=>{ if(event.target===backdrop) closePanel(); });
   document.addEventListener('keydown',(event)=>{ if(event.key==='Escape'&&!backdrop.hidden) closePanel(); });
   repairButton.addEventListener('click',()=>{ window.HRState.repairHull(); renderEngineering(); });
-  document.querySelectorAll('[data-destination]').forEach((button)=>button.addEventListener('click',()=>{
-    const result=window.HRState.setLocation(button.dataset.destination);
-    if(result.ok) closePanel();
+  document.querySelectorAll('[data-destination]').forEach((button)=>button.addEventListener('click',async()=>{
+    if(travelInProgress) return;
+    const destination=button.dataset.destination, result=window.HRState.beginTravel(destination);
+    if(!result.ok) return;
+    travelInProgress=true; closePanel();
+    locationName.textContent='In Transit';
+    try {
+      await window.WayfarerScene.showTravel(result.origin,destination);
+      window.HRState.completeTravel(destination);
+    } catch(error) {
+      console.error('Travel presentation failed.',error);
+      window.HRState.cancelTravel();
+    } finally { travelInProgress=false; renderLocation(window.HRState.get()); }
   }));
-  window.HRState.subscribe((state)=>{ renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
+  window.HRState.subscribe((state)=>{ if(!travelInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
   async function start(){
     try { renderLocation(window.HRState.get()); await window.WayfarerScene.mount(sceneHost); document.body.classList.add('ready'); }
     catch(error){ console.error('Wayfarer graphical proof failed to start.',error); document.getElementById('startup-error').hidden=false; }
