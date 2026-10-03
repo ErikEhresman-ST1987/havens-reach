@@ -7,7 +7,7 @@
     haven:{stationary:'assets/haven-viewport.webp',docked:'assets/haven-docked-viewport.webp'},
     meridian:{stationary:'assets/meridian-viewport.webp',docked:'assets/meridian-docked-viewport.webp'}
   };
-  let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, viewportSprite=null, elapsed=0, cueElapsed=0, cueLayer=null, travelLayer=null, travelResolve=null;
+  let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, viewportSprite=null, shipLayer=null, stationLayer=null, elapsed=0, cueElapsed=0, cueLayer=null, travelLayer=null, travelResolve=null;
   const hotspots=[
     {id:'operations',label:'Operations / Cargo',x:248,y:520,w:210,h:190},
     {id:'navigation',label:'Navigation / Helm',x:520,y:520,w:460,h:245},
@@ -16,6 +16,7 @@
   ];
   function announce(text){ document.getElementById('interaction-label').textContent=text; }
   function request(id){ window.dispatchEvent(new CustomEvent('hr:console',{detail:{id}})); }
+  function requestPerson(id){ window.dispatchEvent(new CustomEvent('hr:person',{detail:{id}})); }
   function makeHotspot(def){
     const g=new PIXI.Graphics();
     g.rect(def.x,def.y,def.w,def.h).fill({color:0xffffff,alpha:0.001});
@@ -56,15 +57,24 @@
     await app.init({width:DESIGN_W,height:DESIGN_H,background:'#070b12',antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,2)});
     app.canvas.setAttribute('aria-hidden','true'); host.replaceChildren(app.canvas);
     const state=window.HRState.get();
-    const [deckTexture,viewportTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load((VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven)[state.condition]||(VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven).stationary)]);
+    const [deckTexture,viewportTexture,stationTexture,seliTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load((VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven)[state.condition]||(VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven).stationary),PIXI.Assets.load('assets/meridian-dock.webp'),PIXI.Assets.load('assets/seli-varen-figure.webp')]);
+    shipLayer=new PIXI.Container(); app.stage.addChild(shipLayer);
     viewportSprite=new PIXI.Sprite(viewportTexture); viewportSprite.position.set(VIEWPORT_CROP.x,VIEWPORT_CROP.y); viewportSprite.width=VIEWPORT_CROP.w; viewportSprite.height=VIEWPORT_CROP.h;
-    const viewportMask=new PIXI.Graphics(); viewportMask.poly(VIEWPORT_POLY).fill(0xffffff); viewportSprite.mask=viewportMask; app.stage.addChild(viewportSprite,viewportMask);
-    const deck=new PIXI.Sprite(deckTexture); deck.width=DESIGN_W; deck.height=DESIGN_H; app.stage.addChild(deck);
-    engineeringLamp=new PIXI.Graphics(); app.stage.addChild(engineeringLamp);
-    hotspots.forEach((def)=>app.stage.addChild(makeHotspot(def)));
+    const viewportMask=new PIXI.Graphics(); viewportMask.poly(VIEWPORT_POLY).fill(0xffffff); viewportSprite.mask=viewportMask; shipLayer.addChild(viewportSprite,viewportMask);
+    const deck=new PIXI.Sprite(deckTexture); deck.width=DESIGN_W; deck.height=DESIGN_H; shipLayer.addChild(deck);
+    engineeringLamp=new PIXI.Graphics(); shipLayer.addChild(engineeringLamp);
+    hotspots.forEach((def)=>shipLayer.addChild(makeHotspot(def)));
+    stationLayer=new PIXI.Container();
+    const stationBg=new PIXI.Sprite(stationTexture), cover=Math.max(DESIGN_W/stationTexture.width,DESIGN_H/stationTexture.height);
+    stationBg.scale.set(cover); stationBg.position.set((DESIGN_W-stationTexture.width*cover)/2,(DESIGN_H-stationTexture.height*cover)/2); stationLayer.addChild(stationBg);
+    const seli=new PIXI.Sprite(seliTexture); seli.anchor.set(.5,1); seli.height=430; seli.scale.x=seli.scale.y; seli.position.set(1165,910); stationLayer.addChild(seli);
+    const seliGlow=new PIXI.Graphics(); seliGlow.ellipse(1165,690,125,245).stroke({color:0x55bbb2,alpha:.58,width:5}); seliGlow.alpha=.58; stationLayer.addChild(seliGlow);
+    const seliHotspot=new PIXI.Graphics(); seliHotspot.roundRect(1015,455,300,475,28).fill({color:0xffffff,alpha:.001}); seliHotspot.eventMode='static'; seliHotspot.cursor='pointer'; seliHotspot.accessible=true; seliHotspot.accessibleTitle='Seli Varen — Veylan Broker'; seliHotspot.on('pointerover',()=>announce('Seli Varen — Veylan Broker')); seliHotspot.on('pointerout',()=>announce('')); seliHotspot.on('pointertap',()=>requestPerson('seli')); stationLayer.addChild(seliHotspot);
+    app.stage.addChild(stationLayer);
     if(!matchMedia('(prefers-reduced-motion: reduce)').matches) addDiscoveryCues();
-    updateCondition(state);
-    unsubscribe=window.HRState.subscribe((next)=>{ updateCondition(next); updateViewport(next); });
+    function updateWorld(next){ const ashore=next.operatorLocation==='meridian-dock'; shipLayer.visible=!ashore; stationLayer.visible=ashore; }
+    updateCondition(state); updateWorld(state);
+    unsubscribe=window.HRState.subscribe((next)=>{ updateCondition(next); updateViewport(next); updateWorld(next); });
     app.ticker.add((ticker)=>{
       const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
       if(cueLayer){
@@ -150,7 +160,7 @@
     });
   }
   async function destroy(){
-    if(unsubscribe) unsubscribe(); unsubscribe=null; if(travelResolve){travelResolve();travelResolve=null;} if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;} engineeringLamp=null; engineeringHotspot=null; viewportSprite=null; cueLayer=null; elapsed=0; cueElapsed=0;
+    if(unsubscribe) unsubscribe(); unsubscribe=null; if(travelResolve){travelResolve();travelResolve=null;} if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;} engineeringLamp=null; engineeringHotspot=null; viewportSprite=null; shipLayer=null; stationLayer=null; cueLayer=null; elapsed=0; cueElapsed=0;
     if(app){ app.destroy(true,{children:true}); app=null; }
     if(host) host.replaceChildren();
   }

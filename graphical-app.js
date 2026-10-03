@@ -5,7 +5,7 @@
     closeNavigationButton=document.getElementById('close-navigation'), repairButton=document.getElementById('repair-button'),
     hullValue=document.getElementById('hull-value'), creditsValue=document.getElementById('credits-value'),
     repairCopy=document.getElementById('repair-copy'), navigationCopy=document.getElementById('navigation-copy'),
-    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), exitShipButton=document.getElementById('exit-ship-button'), returnShipButton=document.getElementById('return-ship-button'), stationScene=document.getElementById('station-scene'), sceneHost=document.getElementById('scene');
+    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), exitShipButton=document.getElementById('exit-ship-button'), returnShipButton=document.getElementById('return-ship-button'), stationUI=document.getElementById('station-ui'), sceneHost=document.getElementById('scene'), seliPanel=document.getElementById('seli-panel'), closeSeliButton=document.getElementById('close-seli'), seliCopy=document.getElementById('seli-copy'), seliChoices=document.getElementById('seli-choices');
   const LOCATION_NAMES={haven:'Haven Orbit',meridian:'Meridian Exchange'};
   let activePanel=null, travelInProgress=false, dockingInProgress=false, stationTransitionInProgress=false;
   function renderLocation(state){
@@ -15,7 +15,7 @@
     dockButton.disabled=travelInProgress||dockingInProgress||stationTransitionInProgress||state.operatorLocation!=='aboard'||!['stationary','docked'].includes(state.condition);
     dockButton.hidden=state.operatorLocation!=='aboard';
     exitShipButton.hidden=!(state.location==='meridian'&&state.condition==='docked'&&state.operatorLocation==='aboard');
-    stationScene.hidden=state.operatorLocation!=='meridian-dock';
+    stationUI.hidden=state.operatorLocation!=='meridian-dock';
   }
   function renderEngineering(){
     const state=window.HRState.get(), quote=window.HRState.repairQuote();
@@ -31,17 +31,24 @@
     document.querySelectorAll('[data-destination]').forEach((button)=>{button.disabled=button.dataset.destination===state.location;button.classList.toggle('current',button.disabled);});
   }
   function openPanel(panel){
-    activePanel=panel; engineeringPanel.hidden=panel!=='engineering'; navigationPanel.hidden=panel!=='navigation';
-    if(panel==='engineering') renderEngineering(); else renderNavigation();
+    activePanel=panel; engineeringPanel.hidden=panel!=='engineering'; navigationPanel.hidden=panel!=='navigation'; seliPanel.hidden=panel!=='seli';
+    if(panel==='engineering') renderEngineering(); else if(panel==='navigation') renderNavigation(); else renderSeli();
     backdrop.hidden=false; document.body.classList.add('panel-open');
-    (panel==='engineering'?closeEngineeringButton:closeNavigationButton).focus();
+    (panel==='engineering'?closeEngineeringButton:panel==='navigation'?closeNavigationButton:closeSeliButton).focus();
   }
   function closePanel(){
     if(!activePanel) return;
-    const focusId=activePanel==='engineering'?'semantic-engineering':'semantic-navigation';
-    backdrop.hidden=true; engineeringPanel.hidden=false; navigationPanel.hidden=true; document.body.classList.remove('panel-open');
-    activePanel=null; document.getElementById(focusId).focus({preventScroll:true});
+    const focusId=activePanel==='engineering'?'semantic-engineering':activePanel==='navigation'?'semantic-navigation':null;
+    backdrop.hidden=true; engineeringPanel.hidden=false; navigationPanel.hidden=true; seliPanel.hidden=true; document.body.classList.remove('panel-open');
+    activePanel=null; if(focusId) document.getElementById(focusId).focus({preventScroll:true});
   }
+  function renderSeli(){
+    const seli=window.HRState.get().npcs?.seli||{met:false,memory:{}};
+    if(!seli.met){ seliCopy.textContent='Seli Varen is a patient Veylan freight broker who seems to remember every price, promise, and favor that passes through Meridian Exchange.'; seliChoices.innerHTML='<button type="button" data-seli-choice="share">Share some of your market notes</button><button type="button" data-seli-choice="private">Keep your figures private</button>'; return; }
+    seliCopy.textContent=seli.memory?.sharedMarketNotes?'Seli treats you as an operator willing to exchange useful information instead of guarding every advantage.':'Seli respects your discretion, though the Veylan broker has not forgotten that you keep your market information close.';
+    seliChoices.innerHTML='<button type="button" data-seli-choice="close">Continue</button>';
+  }
+  function personIntent(id){ const s=window.HRState.get(); if(id==='seli'&&s.location==='meridian'&&s.condition==='docked'&&s.operatorLocation==='meridian-dock') openPanel('seli'); }
   function consoleIntent(id){
     if(travelInProgress||dockingInProgress||stationTransitionInProgress||window.HRState.get().operatorLocation!=='aboard') return;
     if(id==='engineering'||id==='navigation'){ openPanel(id); return; }
@@ -50,8 +57,10 @@
     window.setTimeout(()=>{ if(label.textContent.includes('not active')) label.textContent=''; },1800);
   }
   window.addEventListener('hr:console',(event)=>consoleIntent(event.detail.id));
+  window.addEventListener('hr:person',(event)=>personIntent(event.detail.id));
   document.querySelectorAll('[data-console]').forEach((button)=>button.addEventListener('click',()=>consoleIntent(button.dataset.console)));
-  closeEngineeringButton.addEventListener('click',closePanel); closeNavigationButton.addEventListener('click',closePanel);
+  closeEngineeringButton.addEventListener('click',closePanel); closeNavigationButton.addEventListener('click',closePanel); closeSeliButton.addEventListener('click',closePanel);
+  seliChoices.addEventListener('click',(event)=>{ const button=event.target.closest('[data-seli-choice]'); if(!button) return; const choice=button.dataset.seliChoice; if(choice==='close'){closePanel();return;} const result=window.HRState.chooseSeliFirstMeeting(choice); if(result.ok) renderSeli(); });
   backdrop.addEventListener('click',(event)=>{ if(event.target===backdrop) closePanel(); });
   document.addEventListener('keydown',(event)=>{ if(event.key==='Escape'&&!backdrop.hidden) closePanel(); });
   repairButton.addEventListener('click',()=>{ window.HRState.repairHull(); renderEngineering(); });
@@ -94,7 +103,7 @@
     try { window.HRState.returnToShip(); await window.WayfarerScene.showStationTransition('RETURNING TO WAYFARER'); }
     finally { stationTransitionInProgress=false; returnShipButton.disabled=false; renderLocation(window.HRState.get()); }
   });
-  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress&&!stationTransitionInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
+  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress&&!stationTransitionInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); if(activePanel==='seli') renderSeli(); });
   async function start(){
     try { renderLocation(window.HRState.get()); await window.WayfarerScene.mount(sceneHost); document.body.classList.add('ready'); }
     catch(error){ console.error('Wayfarer graphical proof failed to start.',error); document.getElementById('startup-error').hidden=false; }
