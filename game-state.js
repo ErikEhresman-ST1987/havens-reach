@@ -8,7 +8,8 @@
     app: 'havens-reach-graphical', dataVersion: DATA_VERSION,
     location: 'haven', operatorLocation: 'aboard', condition: 'stationary', credits: 700,
     ship: { id: 'wayfarer', name: 'Wayfarer', hull: 92, hullMax: 100, fuel: 80, fuelMax: 80, cargoCapacity: 8 },
-    npcs: { seli: { met: false, relationship: 0, memory: {} } }
+    npcs: { seli: { met: false, relationship: 0, memory: {} } },
+    cargo: {}, activeContract: null, completedContracts: [], reputation: 0
   });
   function validState(c) {
     return Boolean(c && c.app === 'havens-reach-graphical' && c.dataVersion === DATA_VERSION &&
@@ -37,6 +38,31 @@
     state.npcs.seli.met = Boolean(state.npcs.seli.met);
   }
   ensureSeli();
+  function ensureWorkState() {
+    if (!state.cargo || typeof state.cargo !== 'object') state.cargo = {};
+    if (!Array.isArray(state.completedContracts)) state.completedContracts = [];
+    if (!Number.isFinite(state.reputation)) state.reputation = 0;
+    if (!('activeContract' in state)) state.activeContract = null;
+  }
+  ensureWorkState();
+  const SUPPLY_RUN = { id:'haven-food', title:'Supply Run', destination:'meridian', reward:220, cargo:{food:2}, rep:1, text:'A family-owned canteen needs packaged food delivered to Meridian Exchange.' };
+  function cargoUsed(){ ensureWorkState(); return Object.values(state.cargo).reduce((sum,qty)=>sum+(Number.isFinite(qty)?qty:0),0); }
+  function acceptSupplyRun(){
+    ensureWorkState();
+    if(state.location!=='haven'||state.operatorLocation!=='aboard'||state.activeContract) return {ok:false,state:snapshot()};
+    const needed=2;
+    if(cargoUsed()+needed>state.ship.cargoCapacity) return {ok:false,reason:'cargo',state:snapshot()};
+    state.cargo.food=(state.cargo.food||0)+needed; state.activeContract={...SUPPLY_RUN,cargo:{...SUPPLY_RUN.cargo}};
+    save(); notify(); return {ok:true,state:snapshot()};
+  }
+  function completeSupplyRun(){
+    ensureWorkState(); const c=state.activeContract;
+    if(!c||c.id!==SUPPLY_RUN.id||state.location!=='meridian'||state.condition!=='docked'||state.operatorLocation!=='aboard') return {ok:false,state:snapshot()};
+    state.cargo.food=Math.max(0,(state.cargo.food||0)-2); if(!state.cargo.food) delete state.cargo.food;
+    state.credits+=c.reward; state.reputation+=c.rep; if(!state.completedContracts.includes(c.id)) state.completedContracts.push(c.id); state.activeContract=null;
+    save(); notify(); return {ok:true,state:snapshot()};
+  }
+  function workStatus(){ ensureWorkState(); return {supplyRun:{...SUPPLY_RUN,cargo:{...SUPPLY_RUN.cargo}},cargoUsed:cargoUsed(),cargoCapacity:state.ship.cargoCapacity}; }
   const listeners = new Set();
   function snapshot() { return typeof structuredClone === 'function' ? structuredClone(state) : JSON.parse(JSON.stringify(state)); }
   function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
@@ -107,5 +133,5 @@
     return { ok: true, quote, state: snapshot() };
   }
   function subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, dock, undock, exitShip, returnToShip, chooseSeliFirstMeeting, repairQuote, repairHull, subscribe, save };
+  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, dock, undock, exitShip, returnToShip, chooseSeliFirstMeeting, acceptSupplyRun, completeSupplyRun, workStatus, repairQuote, repairHull, subscribe, save };
 })();

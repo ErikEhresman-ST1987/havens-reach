@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070b12">
   <title>Haven's Reach — Wayfarer Graphical Proof</title>
-  <link rel="stylesheet" href="graphical.css?v=seli-proof-1">
+  <link rel="stylesheet" href="graphical.css?v=operator-work-1">
 </head>
 <body>
   <main id="game-shell">
@@ -46,6 +46,16 @@
         <button class="destination" data-destination="meridian" type="button"><strong>Meridian Exchange</strong><span>Commercial hub</span></button>
       </div>
     </section>
+    <section id="communications-panel" class="focus-panel work-panel" role="dialog" aria-modal="true" aria-labelledby="communications-title" hidden>
+      <button id="close-communications" class="close" type="button" aria-label="Close Communications">×</button>
+      <p class="eyebrow">WAYFARER / COMMUNICATIONS</p><h1 id="communications-title">Available Work</h1>
+      <div id="communications-copy"></div><button id="accept-supply-run" class="primary" type="button">Accept Supply Run</button>
+    </section>
+    <section id="operations-panel" class="focus-panel work-panel" role="dialog" aria-modal="true" aria-labelledby="operations-title" hidden>
+      <button id="close-operations" class="close" type="button" aria-label="Close Operations">×</button>
+      <p class="eyebrow">WAYFARER / OPERATIONS</p><h1 id="operations-title">Cargo & Work</h1>
+      <div id="operations-copy"></div><button id="complete-supply-run" class="primary" type="button" hidden>Complete Delivery</button>
+    </section>
     <section id="seli-panel" class="focus-panel character-panel" role="dialog" aria-modal="true" aria-labelledby="seli-title" hidden>
       <button id="close-seli" class="close" type="button" aria-label="Close conversation">×</button>
       <img class="character-portrait" src="assets/seli-varen-portrait.webp" alt="Seli Varen">
@@ -53,8 +63,8 @@
     </section>
   </div>
   <script src="vendor/pixi.min.js"></script>
-  <script src="game-state.js?v=seli-proof-1"></script>
-  <script src="wayfarer-scene.js?v=seli-proof-1"></script>
-  <script src="graphical-app.js?v=seli-proof-1"></script>
+  <script src="game-state.js?v=operator-work-1"></script>
+  <script src="wayfarer-scene.js?v=operator-work-1"></script>
+  <script src="graphical-app.js?v=operator-work-1"></script>
 </body>
 </html>
