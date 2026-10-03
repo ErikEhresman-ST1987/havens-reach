@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#070b12">
   <title>Haven's Reach — Wayfarer Graphical Proof</title>
-  <link rel="stylesheet" href="graphical.css?v=docking-proof-1">
+  <link rel="stylesheet" href="graphical.css?v=station-entry-proof-1">
 </head>
 <body>
   <main id="game-shell">
@@ -14,6 +14,12 @@
       <div id="location-chip"><strong>WAYFARER</strong><span id="location-name">Haven Orbit</span></div>
       <div id="interaction-label" aria-live="polite"></div>
       <button id="dock-button" class="dock-control" type="button">Dock</button>
+      <button id="exit-ship-button" class="exit-ship-control" type="button" hidden>Exit Ship</button>
+      <section id="station-scene" class="station-scene" hidden aria-label="Meridian Exchange dock">
+        <img src="assets/meridian-dock.webp" alt="">
+        <div class="station-chip"><strong>MERIDIAN EXCHANGE</strong><span>Dock</span></div>
+        <button id="return-ship-button" class="return-ship-control" type="button">Return to Wayfarer</button>
+      </section>
       <button class="semantic-console" data-console="operations" type="button">Operations / Cargo</button>
       <button id="semantic-navigation" class="semantic-console" data-console="navigation" type="button">Navigation / Helm</button>
       <button class="semantic-console" data-console="communications" type="button">Communications</button>
@@ -43,8 +49,8 @@
     </section>
   </div>
   <script src="vendor/pixi.min.js"></script>
-  <script src="game-state.js?v=docking-proof-1"></script>
-  <script src="wayfarer-scene.js?v=docking-proof-1"></script>
-  <script src="graphical-app.js?v=docking-proof-1"></script>
+  <script src="game-state.js?v=station-entry-proof-1"></script>
+  <script src="wayfarer-scene.js?v=station-entry-proof-1"></script>
+  <script src="graphical-app.js?v=station-entry-proof-1"></script>
 </body>
 </html>
