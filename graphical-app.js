@@ -5,14 +5,17 @@
     closeNavigationButton=document.getElementById('close-navigation'), repairButton=document.getElementById('repair-button'),
     hullValue=document.getElementById('hull-value'), creditsValue=document.getElementById('credits-value'),
     repairCopy=document.getElementById('repair-copy'), navigationCopy=document.getElementById('navigation-copy'),
-    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), sceneHost=document.getElementById('scene');
+    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), exitShipButton=document.getElementById('exit-ship-button'), returnShipButton=document.getElementById('return-ship-button'), stationScene=document.getElementById('station-scene'), sceneHost=document.getElementById('scene');
   const LOCATION_NAMES={haven:'Haven Orbit',meridian:'Meridian Exchange'};
-  let activePanel=null, travelInProgress=false, dockingInProgress=false;
+  let activePanel=null, travelInProgress=false, dockingInProgress=false, stationTransitionInProgress=false;
   function renderLocation(state){
     const base=LOCATION_NAMES[state.location]||state.location;
     locationName.textContent=state.condition==='docked'?base+' — Docked':base;
     dockButton.textContent=state.condition==='docked'?'Undock':'Dock';
-    dockButton.disabled=travelInProgress||dockingInProgress||!['stationary','docked'].includes(state.condition);
+    dockButton.disabled=travelInProgress||dockingInProgress||stationTransitionInProgress||state.operatorLocation!=='aboard'||!['stationary','docked'].includes(state.condition);
+    dockButton.hidden=state.operatorLocation!=='aboard';
+    exitShipButton.hidden=!(state.location==='meridian'&&state.condition==='docked'&&state.operatorLocation==='aboard');
+    stationScene.hidden=state.operatorLocation!=='meridian-dock';
   }
   function renderEngineering(){
     const state=window.HRState.get(), quote=window.HRState.repairQuote();
@@ -40,7 +43,7 @@
     activePanel=null; document.getElementById(focusId).focus({preventScroll:true});
   }
   function consoleIntent(id){
-    if(travelInProgress||dockingInProgress) return;
+    if(travelInProgress||dockingInProgress||stationTransitionInProgress||window.HRState.get().operatorLocation!=='aboard') return;
     if(id==='engineering'||id==='navigation'){ openPanel(id); return; }
     const names={operations:'Operations / Cargo',communications:'Communications'};
     const label=document.getElementById('interaction-label'); label.textContent=`${names[id]} — not active in this proof`;
@@ -77,7 +80,21 @@
     } catch(error){ console.error('Docking presentation failed.',error); }
     finally { dockingInProgress=false; renderLocation(window.HRState.get()); }
   });
-  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
+  exitShipButton.addEventListener('click',async()=>{
+    const before=window.HRState.get();
+    if(stationTransitionInProgress||before.location!=='meridian'||before.condition!=='docked'||before.operatorLocation!=='aboard') return;
+    stationTransitionInProgress=true; exitShipButton.disabled=true;
+    try { await window.WayfarerScene.showStationTransition('LEAVING WAYFARER'); window.HRState.exitShip(); }
+    finally { stationTransitionInProgress=false; exitShipButton.disabled=false; renderLocation(window.HRState.get()); }
+  });
+  returnShipButton.addEventListener('click',async()=>{
+    const before=window.HRState.get();
+    if(stationTransitionInProgress||before.operatorLocation!=='meridian-dock') return;
+    stationTransitionInProgress=true; returnShipButton.disabled=true;
+    try { window.HRState.returnToShip(); await window.WayfarerScene.showStationTransition('RETURNING TO WAYFARER'); }
+    finally { stationTransitionInProgress=false; returnShipButton.disabled=false; renderLocation(window.HRState.get()); }
+  });
+  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress&&!stationTransitionInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); });
   async function start(){
     try { renderLocation(window.HRState.get()); await window.WayfarerScene.mount(sceneHost); document.body.classList.add('ready'); }
     catch(error){ console.error('Wayfarer graphical proof failed to start.',error); document.getElementById('startup-error').hidden=false; }
