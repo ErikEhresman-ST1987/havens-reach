@@ -1,168 +1,32 @@
 (() => {
-  'use strict';
-  const DESIGN_W = 1536, DESIGN_H = 1024;
-  const VIEWPORT_CROP = { x: 160, y: 72, w: 1230, h: 463 };
-  const VIEWPORT_POLY = [174,82, 1350,82, 1380,522, 170,522];
-  const VIEWPORT_ASSETS = {
-    haven:{stationary:'assets/haven-viewport.webp',docked:'assets/haven-docked-viewport.webp'},
-    meridian:{stationary:'assets/meridian-viewport.webp',docked:'assets/meridian-docked-viewport.webp'}
-  };
-  let app=null, host=null, unsubscribe=null, engineeringLamp=null, engineeringHotspot=null, viewportSprite=null, shipLayer=null, stationLayer=null, elapsed=0, cueElapsed=0, cueLayer=null, travelLayer=null, travelResolve=null;
-  const hotspots=[
-    {id:'operations',label:'Operations / Cargo',x:248,y:520,w:210,h:190},
-    {id:'navigation',label:'Navigation / Helm',x:520,y:520,w:460,h:245},
-    {id:'communications',label:'Communications',x:1020,y:520,w:250,h:190},
-    {id:'engineering',label:'Engineering',x:1050,y:710,w:235,h:165}
-  ];
-  function announce(text){ document.getElementById('interaction-label').textContent=text; }
-  function request(id){ window.dispatchEvent(new CustomEvent('hr:console',{detail:{id}})); }
-  function requestPerson(id){ window.dispatchEvent(new CustomEvent('hr:person',{detail:{id}})); }
-  function makeHotspot(def){
-    const g=new PIXI.Graphics();
-    g.rect(def.x,def.y,def.w,def.h).fill({color:0xffffff,alpha:0.001});
-    g.eventMode='static'; g.cursor='pointer';
-    g.on('pointerover',()=>announce(def.label)); g.on('pointerout',()=>announce(''));
-    g.on('pointertap',()=>request(def.id));
-    if(def.id==='engineering') engineeringHotspot=g;
-    return g;
-  }
-  function addDiscoveryCues(){
-    cueLayer=new PIXI.Container();
-    hotspots.forEach((def,index)=>{
-      const cx=def.x+def.w/2, cy=def.y+def.h/2;
-      const glow=new PIXI.Graphics();
-      glow.ellipse(cx,cy,def.w*.62,def.h*.58).fill({color:0xf2a84a,alpha:.12});
-      glow.ellipse(cx,cy,def.w*.50,def.h*.46).fill({color:0x78cfe0,alpha:.08});
-      glow.roundRect(def.x-8,def.y-8,def.w+16,def.h+16,18).stroke({color:0xf3b45e,alpha:.62,width:4});
-      glow.alpha=0; glow._cueDelay=index*180; cueLayer.addChild(glow);
-    });
-    app.stage.addChild(cueLayer);
-  }
-  function updateCondition(state){
-    if(!engineeringLamp) return;
-    const damaged=state.ship.hull<state.ship.hullMax;
-    engineeringLamp.clear();
-    engineeringLamp.circle(1208,728,7).fill({color:damaged?0xff9d2e:0x62d6c7,alpha:.92});
-    engineeringLamp.circle(1208,728,13).stroke({color:damaged?0xff9d2e:0x62d6c7,alpha:.28,width:2});
-    if(engineeringHotspot) engineeringHotspot.accessibleTitle=damaged?'Engineering — hull service needed':'Engineering — hull nominal';
-  }
-  async function updateViewport(state){
-    if(!viewportSprite) return;
-    const family=VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven, asset=family[state.condition]||family.stationary;
-    viewportSprite.texture=await PIXI.Assets.load(asset);
-  }
-  async function mount(target){
-    if(app) await destroy();
-    host=target; app=new PIXI.Application();
-    await app.init({width:DESIGN_W,height:DESIGN_H,background:'#070b12',antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,2)});
-    app.canvas.setAttribute('aria-hidden','true'); host.replaceChildren(app.canvas);
-    const state=window.HRState.get();
-    const [deckTexture,viewportTexture,stationTexture,seliTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load((VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven)[state.condition]||(VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven).stationary),PIXI.Assets.load('assets/meridian-dock.webp'),PIXI.Assets.load('assets/seli-varen-figure.webp')]);
-    shipLayer=new PIXI.Container(); app.stage.addChild(shipLayer);
-    viewportSprite=new PIXI.Sprite(viewportTexture); viewportSprite.position.set(VIEWPORT_CROP.x,VIEWPORT_CROP.y); viewportSprite.width=VIEWPORT_CROP.w; viewportSprite.height=VIEWPORT_CROP.h;
-    const viewportMask=new PIXI.Graphics(); viewportMask.poly(VIEWPORT_POLY).fill(0xffffff); viewportSprite.mask=viewportMask; shipLayer.addChild(viewportSprite,viewportMask);
-    const deck=new PIXI.Sprite(deckTexture); deck.width=DESIGN_W; deck.height=DESIGN_H; shipLayer.addChild(deck);
-    engineeringLamp=new PIXI.Graphics(); shipLayer.addChild(engineeringLamp);
-    hotspots.forEach((def)=>shipLayer.addChild(makeHotspot(def)));
-    stationLayer=new PIXI.Container();
-    const stationBg=new PIXI.Sprite(stationTexture), cover=Math.max(DESIGN_W/stationTexture.width,DESIGN_H/stationTexture.height);
-    stationBg.scale.set(cover); stationBg.position.set((DESIGN_W-stationTexture.width*cover)/2,(DESIGN_H-stationTexture.height*cover)/2); stationLayer.addChild(stationBg);
-    const seli=new PIXI.Sprite(seliTexture); seli.anchor.set(.5,1); seli.height=430; seli.scale.x=seli.scale.y; seli.position.set(1165,910); stationLayer.addChild(seli);
-    const seliGlow=new PIXI.Graphics(); seliGlow.ellipse(1165,690,125,245).stroke({color:0x55bbb2,alpha:.58,width:5}); seliGlow.alpha=.58; stationLayer.addChild(seliGlow);
-    const seliHotspot=new PIXI.Graphics(); seliHotspot.roundRect(1015,455,300,475,28).fill({color:0xffffff,alpha:.001}); seliHotspot.eventMode='static'; seliHotspot.cursor='pointer'; seliHotspot.accessible=true; seliHotspot.accessibleTitle='Seli Varen — Veylan Broker'; seliHotspot.on('pointerover',()=>announce('Seli Varen — Veylan Broker')); seliHotspot.on('pointerout',()=>announce('')); seliHotspot.on('pointertap',()=>requestPerson('seli')); stationLayer.addChild(seliHotspot);
-    app.stage.addChild(stationLayer);
-    if(!matchMedia('(prefers-reduced-motion: reduce)').matches) addDiscoveryCues();
-    function updateWorld(next){ const ashore=next.operatorLocation==='meridian-dock'; shipLayer.visible=!ashore; stationLayer.visible=ashore; }
-    updateCondition(state); updateWorld(state);
-    unsubscribe=window.HRState.subscribe((next)=>{ updateCondition(next); updateViewport(next); updateWorld(next); });
-    app.ticker.add((ticker)=>{
-      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(cueLayer){
-        cueElapsed+=ticker.deltaMS;
-        const fadeIn=650, hold=2600, fadeOut=2200, total=fadeIn+hold+fadeOut+540;
-        cueLayer.children.forEach((cue)=>{
-          const t=Math.max(0,cueElapsed-cue._cueDelay);
-          if(t<fadeIn) cue.alpha=t/fadeIn;
-          else if(t<fadeIn+hold) cue.alpha=.92+Math.sin(t/520)*.08;
-          else cue.alpha=Math.max(0,1-(t-fadeIn-hold)/fadeOut);
-        });
-        if(cueElapsed>=total){ cueLayer.destroy({children:true}); cueLayer=null; }
-      }
-      const current=window.HRState.get();
-      if(current.ship.hull>=current.ship.hullMax||reduced){ if(engineeringLamp) engineeringLamp.alpha=1; return; }
-      elapsed+=ticker.deltaMS; if(engineeringLamp) engineeringLamp.alpha=.82+Math.sin(elapsed/720)*.12;
-    });
-  }
-  function showTravel(origin,destination){
-    return new Promise((resolve)=>{
-      if(!app){ resolve(); return; }
-      if(travelLayer) travelLayer.destroy({children:true});
-      travelResolve=resolve;
-      travelLayer=new PIXI.Container();
-      const bg=new PIXI.Graphics(); bg.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x07101a,alpha:.98});
-      const title=new PIXI.Text({text:'ESTABLISHED ROUTE',style:{fontFamily:'Arial, sans-serif',fontSize:28,fill:0xefb25d,letterSpacing:4}});
-      title.position.set(110,105);
-      const originName=origin==='haven'?'HAVEN':'MERIDIAN EXCHANGE', destinationName=destination==='haven'?'HAVEN':'MERIDIAN EXCHANGE';
-      const from=new PIXI.Text({text:originName,style:{fontFamily:'Arial, sans-serif',fontSize:24,fill:0xd8e7e9}}); from.position.set(150,690);
-      const to=new PIXI.Text({text:destinationName,style:{fontFamily:'Arial, sans-serif',fontSize:24,fill:0xd8e7e9}}); to.anchor.set(1,0); to.position.set(1386,690);
-      const route=new PIXI.Graphics(); route.moveTo(230,535).lineTo(1306,535).stroke({color:0x5aa9b7,width:5,alpha:.75});
-      route.circle(230,535,13).fill(0x78cfe0); route.circle(1306,535,13).fill(0x78cfe0);
-      const ship=new PIXI.Graphics(); ship.moveTo(0,-16).lineTo(32,0).lineTo(0,16).lineTo(8,0).closePath().fill(0xefb25d); ship.position.set(230,535);
-      const status=new PIXI.Text({text:'WAYFARER  •  IN TRANSIT',style:{fontFamily:'Arial, sans-serif',fontSize:20,fill:0x9fcbd2,letterSpacing:2}}); status.anchor.set(.5,0); status.position.set(DESIGN_W/2,790);
-      travelLayer.addChild(bg,title,route,from,to,ship,status); app.stage.addChild(travelLayer);
-      const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches, duration=reduced?1200:4200, start=performance.now();
-      function frame(now){
-        if(!travelLayer){ resolve(); return; }
-        const t=Math.min(1,(now-start)/duration), eased=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
-        ship.x=230+(1306-230)*eased;
-        if(t<1) requestAnimationFrame(frame);
-        else { const done=travelResolve; travelResolve=null; travelLayer.destroy({children:true}); travelLayer=null; if(done) done(); }
-      }
-      requestAnimationFrame(frame);
-    });
-  }
-  function showDocking(mode,location){
-    return new Promise((resolve)=>{
-      if(!app){resolve();return;}
-      const layer=new PIXI.Container(), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const veil=new PIXI.Graphics(); veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x050a0f,alpha:.72});
-      const guide=new PIXI.Graphics();
-      guide.moveTo(360,250).lineTo(650,512).lineTo(360,774).stroke({color:0x78cfe0,width:3,alpha:.6});
-      guide.moveTo(1176,250).lineTo(886,512).lineTo(1176,774).stroke({color:0x78cfe0,width:3,alpha:.6});
-      const label=mode==='dock'?'DOCKING APPROACH':'UNDOCKING';
-      const place=location==='haven'?'HAVEN':'MERIDIAN EXCHANGE';
-      const title=new PIXI.Text({text:label,style:{fontFamily:'Arial, sans-serif',fontSize:30,fill:0xefb25d,letterSpacing:4}});
-      title.anchor.set(.5); title.position.set(DESIGN_W/2,430);
-      const sub=new PIXI.Text({text:place+'  •  WAYFARER',style:{fontFamily:'Arial, sans-serif',fontSize:20,fill:0xb9dce1,letterSpacing:2}});
-      sub.anchor.set(.5); sub.position.set(DESIGN_W/2,485);
-      layer.addChild(veil,guide,title,sub); app.stage.addChild(layer);
-      const duration=reduced?700:2200,start=performance.now();
-      function frame(now){
-        const t=Math.min(1,(now-start)/duration);
-        guide.alpha=.45+.35*Math.sin(t*Math.PI);
-        layer.alpha=t<.15?t/.15:t>.82?(1-t)/.18:1;
-        if(t<1) requestAnimationFrame(frame); else {layer.destroy({children:true});resolve();}
-      }
-      requestAnimationFrame(frame);
-    });
-  }
-  function showStationTransition(label){
-    return new Promise((resolve)=>{
-      if(!app){resolve();return;}
-      const layer=new PIXI.Container(), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const veil=new PIXI.Graphics(); veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x05090d,alpha:.92});
-      const text=new PIXI.Text({text:label,style:{fontFamily:'Arial, sans-serif',fontSize:28,fill:0xefb25d,letterSpacing:4}});
-      text.anchor.set(.5); text.position.set(DESIGN_W/2,DESIGN_H/2);
-      layer.addChild(veil,text); app.stage.addChild(layer);
-      const duration=reduced?350:900,start=performance.now();
-      function frame(now){const t=Math.min(1,(now-start)/duration);layer.alpha=t<.35?t/.35:1-(t-.35)/.65;if(t<1)requestAnimationFrame(frame);else{layer.destroy({children:true});resolve();}}
-      requestAnimationFrame(frame);
-    });
-  }
-  async function destroy(){
-    if(unsubscribe) unsubscribe(); unsubscribe=null; if(travelResolve){travelResolve();travelResolve=null;} if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;} engineeringLamp=null; engineeringHotspot=null; viewportSprite=null; shipLayer=null; stationLayer=null; cueLayer=null; elapsed=0; cueElapsed=0;
-    if(app){ app.destroy(true,{children:true}); app=null; }
-    if(host) host.replaceChildren();
-  }
-  window.WayfarerScene={mount,destroy,showTravel,showDocking,showStationTransition};
+'use strict';
+const DESIGN_W=1536,DESIGN_H=1024,VIEWPORT_CROP={x:160,y:72,w:1230,h:463},VIEWPORT_POLY=[174,82,1350,82,1380,522,170,522];
+const VIEWPORT_ASSETS={haven:{stationary:'assets/haven-viewport.webp',docked:'assets/haven-docked-viewport.webp'},meridian:{stationary:'assets/meridian-viewport.webp',docked:'assets/meridian-docked-viewport.webp'},prospect:{stationary:'assets/prospect-arrival-viewport.webp',docked:'assets/prospect-docked-viewport.webp'},calder:{stationary:'assets/calders-drift-arrival-viewport.webp'}};
+const NAMES={haven:'HAVEN',meridian:'MERIDIAN EXCHANGE',prospect:'PROSPECT REACH',calder:"CALDER'S DRIFT"};
+let app=null,host=null,unsubscribe=null,engineeringLamp=null,engineeringHotspot=null,viewportSprite=null,shipLayer=null,meridianLayer=null,lanternLayer=null,elapsed=0,cueElapsed=0,cueLayer=null,travelLayer=null,travelResolve=null;
+const hotspots=[{id:'operations',label:'Operations / Cargo',x:248,y:520,w:210,h:190},{id:'navigation',label:'Navigation / Helm',x:520,y:520,w:460,h:245},{id:'communications',label:'Communications',x:1020,y:520,w:250,h:190},{id:'engineering',label:'Engineering',x:1050,y:710,w:235,h:165}];
+function announce(text){document.getElementById('interaction-label').textContent=text;}
+function request(id){window.dispatchEvent(new CustomEvent('hr:console',{detail:{id}}));}
+function requestPerson(id){window.dispatchEvent(new CustomEvent('hr:person',{detail:{id}}));}
+function requestWorld(id){window.dispatchEvent(new CustomEvent('hr:world',{detail:{id}}));}
+function makeHotspot(def){const g=new PIXI.Graphics();g.rect(def.x,def.y,def.w,def.h).fill({color:0xffffff,alpha:.001});g.eventMode='static';g.cursor='pointer';g.on('pointerover',()=>announce(def.label));g.on('pointerout',()=>announce(''));g.on('pointertap',()=>request(def.id));if(def.id==='engineering')engineeringHotspot=g;return g;}
+function addDiscoveryCues(){cueLayer=new PIXI.Container();hotspots.forEach((def,index)=>{const cx=def.x+def.w/2,cy=def.y+def.h/2,glow=new PIXI.Graphics();glow.ellipse(cx,cy,def.w*.62,def.h*.58).fill({color:0xf2a84a,alpha:.12});glow.ellipse(cx,cy,def.w*.50,def.h*.46).fill({color:0x78cfe0,alpha:.08});glow.roundRect(def.x-8,def.y-8,def.w+16,def.h+16,18).stroke({color:0xf3b45e,alpha:.62,width:4});glow.alpha=0;glow._cueDelay=index*180;cueLayer.addChild(glow);});app.stage.addChild(cueLayer);}
+function updateCondition(state){if(!engineeringLamp)return;const damaged=state.ship.hull<state.ship.hullMax;engineeringLamp.clear();engineeringLamp.circle(1208,728,7).fill({color:damaged?0xff9d2e:0x62d6c7,alpha:.92});engineeringLamp.circle(1208,728,13).stroke({color:damaged?0xff9d2e:0x62d6c7,alpha:.28,width:2});if(engineeringHotspot)engineeringHotspot.accessibleTitle=damaged?'Engineering — hull service needed':'Engineering — hull nominal';}
+async function updateViewport(state){if(!viewportSprite)return;const family=VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven,asset=family[state.condition]||family.stationary;viewportSprite.texture=await PIXI.Assets.load(asset);}
+function sceneSprite(texture){const s=new PIXI.Sprite(texture),cover=Math.max(DESIGN_W/texture.width,DESIGN_H/texture.height);s.scale.set(cover);s.position.set((DESIGN_W-texture.width*cover)/2,(DESIGN_H-texture.height*cover)/2);return s;}
+async function mount(target){if(app)await destroy();host=target;app=new PIXI.Application();await app.init({width:DESIGN_W,height:DESIGN_H,background:'#070b12',antialias:true,autoDensity:true,resolution:Math.min(window.devicePixelRatio||1,2)});app.canvas.setAttribute('aria-hidden','true');host.replaceChildren(app.canvas);
+const state=window.HRState.get(),family=VIEWPORT_ASSETS[state.location]||VIEWPORT_ASSETS.haven;
+const [deckTexture,viewportTexture,stationTexture,seliTexture,lanternTexture]=await Promise.all([PIXI.Assets.load('assets/wayfarer-command-deck.webp'),PIXI.Assets.load(family[state.condition]||family.stationary),PIXI.Assets.load('assets/meridian-dock.webp'),PIXI.Assets.load('assets/seli-varen-figure.webp'),PIXI.Assets.load('assets/last-lantern.webp')]);
+shipLayer=new PIXI.Container();app.stage.addChild(shipLayer);viewportSprite=new PIXI.Sprite(viewportTexture);viewportSprite.position.set(VIEWPORT_CROP.x,VIEWPORT_CROP.y);viewportSprite.width=VIEWPORT_CROP.w;viewportSprite.height=VIEWPORT_CROP.h;const mask=new PIXI.Graphics();mask.poly(VIEWPORT_POLY).fill(0xffffff);viewportSprite.mask=mask;shipLayer.addChild(viewportSprite,mask);const deck=new PIXI.Sprite(deckTexture);deck.width=DESIGN_W;deck.height=DESIGN_H;shipLayer.addChild(deck);engineeringLamp=new PIXI.Graphics();shipLayer.addChild(engineeringLamp);hotspots.forEach(def=>shipLayer.addChild(makeHotspot(def)));
+meridianLayer=new PIXI.Container();meridianLayer.addChild(sceneSprite(stationTexture));const seli=new PIXI.Sprite(seliTexture);seli.anchor.set(.5,1);seli.height=430;seli.scale.x=seli.scale.y;seli.position.set(1165,910);meridianLayer.addChild(seli);const sg=new PIXI.Graphics();sg.ellipse(1165,690,125,245).stroke({color:0x55bbb2,alpha:.58,width:5});meridianLayer.addChild(sg);const sh=new PIXI.Graphics();sh.roundRect(1015,455,300,475,28).fill({color:0xffffff,alpha:.001});sh.eventMode='static';sh.cursor='pointer';sh.on('pointerover',()=>announce('Seli Varen — Veylan Broker'));sh.on('pointerout',()=>announce(''));sh.on('pointertap',()=>requestPerson('seli'));meridianLayer.addChild(sh);app.stage.addChild(meridianLayer);
+lanternLayer=new PIXI.Container();lanternLayer.addChild(sceneSprite(lanternTexture));const glow=new PIXI.Graphics();glow.roundRect(885,305,430,260,28).stroke({color:0xefb25d,alpha:.55,width:5});lanternLayer.addChild(glow);const lead=new PIXI.Graphics();lead.roundRect(850,270,500,330,28).fill({color:0xffffff,alpha:.001});lead.eventMode='static';lead.cursor='pointer';lead.on('pointerover',()=>announce('Survey crews — route talk'));lead.on('pointerout',()=>announce(''));lead.on('pointertap',()=>requestWorld('outer-beacon-reports'));lanternLayer.addChild(lead);app.stage.addChild(lanternLayer);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches)addDiscoveryCues();
+function updateWorld(next){shipLayer.visible=next.operatorLocation==='aboard';meridianLayer.visible=next.operatorLocation==='meridian-dock';lanternLayer.visible=next.operatorLocation==='last-lantern';}
+updateCondition(state);updateWorld(state);unsubscribe=window.HRState.subscribe(next=>{updateCondition(next);updateViewport(next);updateWorld(next);});
+app.ticker.add(t=>{if(cueLayer){cueElapsed+=t.deltaMS;const fadeIn=650,hold=2600,fadeOut=2200,total=fadeIn+hold+fadeOut+540;cueLayer.children.forEach(c=>{const x=Math.max(0,cueElapsed-c._cueDelay);c.alpha=x<fadeIn?x/fadeIn:(x<fadeIn+hold?.92+Math.sin(x/520)*.08:Math.max(0,1-(x-fadeIn-hold)/fadeOut));});if(cueElapsed>=total){cueLayer.destroy({children:true});cueLayer=null;}}const current=window.HRState.get();if(current.ship.hull>=current.ship.hullMax||matchMedia('(prefers-reduced-motion: reduce)').matches){if(engineeringLamp)engineeringLamp.alpha=1;return;}elapsed+=t.deltaMS;if(engineeringLamp)engineeringLamp.alpha=.82+Math.sin(elapsed/720)*.12;});}
+function showTravel(origin,destination){return new Promise(resolve=>{if(!app){resolve();return;}if(travelLayer)travelLayer.destroy({children:true});travelResolve=resolve;travelLayer=new PIXI.Container();const bg=new PIXI.Graphics();bg.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x07101a,alpha:.98});const title=new PIXI.Text({text:'ESTABLISHED ROUTE',style:{fontFamily:'Arial, sans-serif',fontSize:28,fill:0xefb25d,letterSpacing:4}});title.position.set(110,105);const from=new PIXI.Text({text:NAMES[origin]||origin.toUpperCase(),style:{fontFamily:'Arial, sans-serif',fontSize:24,fill:0xd8e7e9}});from.position.set(150,690);const to=new PIXI.Text({text:NAMES[destination]||destination.toUpperCase(),style:{fontFamily:'Arial, sans-serif',fontSize:24,fill:0xd8e7e9}});to.anchor.set(1,0);to.position.set(1386,690);const route=new PIXI.Graphics();route.moveTo(230,535).lineTo(1306,535).stroke({color:0x5aa9b7,width:5,alpha:.75});route.circle(230,535,13).fill(0x78cfe0);route.circle(1306,535,13).fill(0x78cfe0);const ship=new PIXI.Graphics();ship.moveTo(0,-16).lineTo(32,0).lineTo(0,16).lineTo(8,0).closePath().fill(0xefb25d);ship.position.set(230,535);const status=new PIXI.Text({text:'WAYFARER  •  IN TRANSIT',style:{fontFamily:'Arial, sans-serif',fontSize:20,fill:0x9fcbd2,letterSpacing:2}});status.anchor.set(.5,0);status.position.set(DESIGN_W/2,790);travelLayer.addChild(bg,title,route,from,to,ship,status);app.stage.addChild(travelLayer);const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?1200:4200,start=performance.now();function frame(now){if(!travelLayer){resolve();return;}const x=Math.min(1,(now-start)/duration),e=x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;ship.x=230+(1306-230)*e;if(x<1)requestAnimationFrame(frame);else{const done=travelResolve;travelResolve=null;travelLayer.destroy({children:true});travelLayer=null;if(done)done();}}requestAnimationFrame(frame);});}
+function showDocking(mode,location){return new Promise(resolve=>{if(!app){resolve();return;}const layer=new PIXI.Container(),veil=new PIXI.Graphics();veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x050a0f,alpha:.72});const title=new PIXI.Text({text:mode==='dock'?'DOCKING APPROACH':'UNDOCKING',style:{fontFamily:'Arial, sans-serif',fontSize:30,fill:0xefb25d,letterSpacing:4}});title.anchor.set(.5);title.position.set(DESIGN_W/2,450);const sub=new PIXI.Text({text:(NAMES[location]||location.toUpperCase())+'  •  WAYFARER',style:{fontFamily:'Arial, sans-serif',fontSize:20,fill:0xb9dce1,letterSpacing:2}});sub.anchor.set(.5);sub.position.set(DESIGN_W/2,500);layer.addChild(veil,title,sub);app.stage.addChild(layer);setTimeout(()=>{layer.destroy({children:true});resolve();},matchMedia('(prefers-reduced-motion: reduce)').matches?700:2200);});}
+function showStationTransition(label){return new Promise(resolve=>{if(!app){resolve();return;}const layer=new PIXI.Container(),veil=new PIXI.Graphics();veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x05090d,alpha:.92});const txt=new PIXI.Text({text:label,style:{fontFamily:'Arial, sans-serif',fontSize:28,fill:0xefb25d,letterSpacing:4}});txt.anchor.set(.5);txt.position.set(DESIGN_W/2,DESIGN_H/2);layer.addChild(veil,txt);app.stage.addChild(layer);setTimeout(()=>{layer.destroy({children:true});resolve();},matchMedia('(prefers-reduced-motion: reduce)').matches?350:900);});}
+async function destroy(){if(unsubscribe)unsubscribe();unsubscribe=null;if(travelResolve){travelResolve();travelResolve=null;}if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;}engineeringLamp=engineeringHotspot=viewportSprite=shipLayer=meridianLayer=lanternLayer=cueLayer=null;elapsed=cueElapsed=0;if(app){app.destroy(true,{children:true});app=null;}if(host)host.replaceChildren();}
+window.WayfarerScene={mount,destroy,showTravel,showDocking,showStationTransition};
 })();
