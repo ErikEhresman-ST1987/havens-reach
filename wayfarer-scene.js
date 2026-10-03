@@ -136,10 +136,23 @@
       requestAnimationFrame(frame);
     });
   }
+  function showStationTransition(label){
+    return new Promise((resolve)=>{
+      if(!app){resolve();return;}
+      const layer=new PIXI.Container(), reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const veil=new PIXI.Graphics(); veil.rect(0,0,DESIGN_W,DESIGN_H).fill({color:0x05090d,alpha:.92});
+      const text=new PIXI.Text({text:label,style:{fontFamily:'Arial, sans-serif',fontSize:28,fill:0xefb25d,letterSpacing:4}});
+      text.anchor.set(.5); text.position.set(DESIGN_W/2,DESIGN_H/2);
+      layer.addChild(veil,text); app.stage.addChild(layer);
+      const duration=reduced?350:900,start=performance.now();
+      function frame(now){const t=Math.min(1,(now-start)/duration);layer.alpha=t<.35?t/.35:1-(t-.35)/.65;if(t<1)requestAnimationFrame(frame);else{layer.destroy({children:true});resolve();}}
+      requestAnimationFrame(frame);
+    });
+  }
   async function destroy(){
     if(unsubscribe) unsubscribe(); unsubscribe=null; if(travelResolve){travelResolve();travelResolve=null;} if(travelLayer){travelLayer.destroy({children:true});travelLayer=null;} engineeringLamp=null; engineeringHotspot=null; viewportSprite=null; cueLayer=null; elapsed=0; cueElapsed=0;
     if(app){ app.destroy(true,{children:true}); app=null; }
     if(host) host.replaceChildren();
   }
-  window.WayfarerScene={mount,destroy,showTravel,showDocking};
+  window.WayfarerScene={mount,destroy,showTravel,showDocking,showStationTransition};
 })();
