@@ -11,7 +11,7 @@
   });
   function validState(c) {
     return Boolean(c && c.app === 'havens-reach-graphical' && c.dataVersion === DATA_VERSION &&
-      LOCATIONS.has(c.location) && c.operatorLocation === 'aboard' &&
+      LOCATIONS.has(c.location) && ['aboard','meridian-dock'].includes(c.operatorLocation) &&
       Number.isFinite(c.credits) && c.credits >= 0 && c.ship && c.ship.id === 'wayfarer' &&
       Number.isFinite(c.ship.hull) && Number.isFinite(c.ship.hullMax) &&
       c.ship.hull >= 0 && c.ship.hull <= c.ship.hullMax);
@@ -62,6 +62,18 @@
     save(); notify();
     return { ok: true, state: snapshot() };
   }
+  function exitShip() {
+    if (state.location !== 'meridian' || state.condition !== 'docked' || state.operatorLocation !== 'aboard') return { ok: false, state: snapshot() };
+    state = { ...state, operatorLocation: 'meridian-dock' };
+    save(); notify();
+    return { ok: true, state: snapshot() };
+  }
+  function returnToShip() {
+    if (state.location !== 'meridian' || state.condition !== 'docked' || state.operatorLocation !== 'meridian-dock') return { ok: false, state: snapshot() };
+    state = { ...state, operatorLocation: 'aboard' };
+    save(); notify();
+    return { ok: true, state: snapshot() };
+  }
   function repairQuote() {
     const missing = Math.max(0, state.ship.hullMax - state.ship.hull);
     const affordablePoints = Math.floor(state.credits / REPAIR_COST_PER_POINT);
@@ -76,5 +88,5 @@
     return { ok: true, quote, state: snapshot() };
   }
   function subscribe(listener) { listeners.add(listener); return () => listeners.delete(listener); }
-  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, dock, undock, repairQuote, repairHull, subscribe, save };
+  window.HRState = { get: snapshot, beginTravel, completeTravel, cancelTravel, dock, undock, exitShip, returnToShip, repairQuote, repairHull, subscribe, save };
 })();
