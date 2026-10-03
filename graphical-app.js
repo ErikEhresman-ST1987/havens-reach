@@ -5,7 +5,9 @@
     closeNavigationButton=document.getElementById('close-navigation'), repairButton=document.getElementById('repair-button'),
     hullValue=document.getElementById('hull-value'), creditsValue=document.getElementById('credits-value'),
     repairCopy=document.getElementById('repair-copy'), navigationCopy=document.getElementById('navigation-copy'),
-    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), exitShipButton=document.getElementById('exit-ship-button'), returnShipButton=document.getElementById('return-ship-button'), stationUI=document.getElementById('station-ui'), sceneHost=document.getElementById('scene'), seliPanel=document.getElementById('seli-panel'), closeSeliButton=document.getElementById('close-seli'), seliCopy=document.getElementById('seli-copy'), seliChoices=document.getElementById('seli-choices');
+    locationName=document.getElementById('location-name'), dockButton=document.getElementById('dock-button'), exitShipButton=document.getElementById('exit-ship-button'), returnShipButton=document.getElementById('return-ship-button'), stationUI=document.getElementById('station-ui'), sceneHost=document.getElementById('scene'), seliPanel=document.getElementById('seli-panel'), closeSeliButton=document.getElementById('close-seli'), seliCopy=document.getElementById('seli-copy'), seliChoices=document.getElementById('seli-choices'),
+    communicationsPanel=document.getElementById('communications-panel'), closeCommunicationsButton=document.getElementById('close-communications'), communicationsCopy=document.getElementById('communications-copy'), acceptSupplyRunButton=document.getElementById('accept-supply-run'),
+    operationsPanel=document.getElementById('operations-panel'), closeOperationsButton=document.getElementById('close-operations'), operationsCopy=document.getElementById('operations-copy'), completeSupplyRunButton=document.getElementById('complete-supply-run');
   const LOCATION_NAMES={haven:'Haven Orbit',meridian:'Meridian Exchange'};
   let activePanel=null, travelInProgress=false, dockingInProgress=false, stationTransitionInProgress=false;
   function renderLocation(state){
@@ -31,15 +33,15 @@
     document.querySelectorAll('[data-destination]').forEach((button)=>{button.disabled=button.dataset.destination===state.location;button.classList.toggle('current',button.disabled);});
   }
   function openPanel(panel){
-    activePanel=panel; engineeringPanel.hidden=panel!=='engineering'; navigationPanel.hidden=panel!=='navigation'; seliPanel.hidden=panel!=='seli';
-    if(panel==='engineering') renderEngineering(); else if(panel==='navigation') renderNavigation(); else renderSeli();
+    activePanel=panel; engineeringPanel.hidden=panel!=='engineering'; navigationPanel.hidden=panel!=='navigation'; seliPanel.hidden=panel!=='seli'; communicationsPanel.hidden=panel!=='communications'; operationsPanel.hidden=panel!=='operations';
+    if(panel==='engineering') renderEngineering(); else if(panel==='navigation') renderNavigation(); else if(panel==='seli') renderSeli(); else if(panel==='communications') renderCommunications(); else renderOperations();
     backdrop.hidden=false; document.body.classList.add('panel-open');
-    (panel==='engineering'?closeEngineeringButton:panel==='navigation'?closeNavigationButton:closeSeliButton).focus();
+    (panel==='engineering'?closeEngineeringButton:panel==='navigation'?closeNavigationButton:panel==='seli'?closeSeliButton:panel==='communications'?closeCommunicationsButton:closeOperationsButton).focus();
   }
   function closePanel(){
     if(!activePanel) return;
     const focusId=activePanel==='engineering'?'semantic-engineering':activePanel==='navigation'?'semantic-navigation':null;
-    backdrop.hidden=true; engineeringPanel.hidden=false; navigationPanel.hidden=true; seliPanel.hidden=true; document.body.classList.remove('panel-open');
+    backdrop.hidden=true; engineeringPanel.hidden=false; navigationPanel.hidden=true; seliPanel.hidden=true; communicationsPanel.hidden=true; operationsPanel.hidden=true; document.body.classList.remove('panel-open');
     activePanel=null; if(focusId) document.getElementById(focusId).focus({preventScroll:true});
   }
   function renderSeli(){
@@ -48,18 +50,31 @@
     seliCopy.textContent=seli.memory?.sharedMarketNotes?'Seli treats you as an operator willing to exchange useful information instead of guarding every advantage.':'Seli respects your discretion, though the Veylan broker has not forgotten that you keep your market information close.';
     seliChoices.innerHTML='<button type="button" data-seli-choice="close">Continue</button>';
   }
+  function renderCommunications(){
+    const s=window.HRState.get(), work=window.HRState.workStatus().supplyRun, completed=s.completedContracts?.includes(work.id), active=s.activeContract?.id===work.id;
+    if(s.location!=='haven'){communicationsCopy.innerHTML='<div class="work-card">No Haven postings are available on this local link. Return to Haven to review originating work.</div>';acceptSupplyRunButton.hidden=true;return;}
+    if(active){communicationsCopy.innerHTML='<div class="work-card"><strong>Supply Run — Active</strong><p>'+work.text+'</p><div class="work-meta"><span>Destination: Meridian Exchange</span><span>220 cr</span></div></div>';acceptSupplyRunButton.hidden=true;return;}
+    communicationsCopy.innerHTML='<div class="work-card"><strong>Supply Run</strong><p>'+work.text+'</p><div class="work-meta"><span>Cargo: 2 Packaged Food</span><span>Reward: 220 cr</span></div></div>';
+    acceptSupplyRunButton.hidden=false; acceptSupplyRunButton.disabled=Boolean(s.activeContract); acceptSupplyRunButton.textContent=completed?'Accept Supply Run Again':'Accept Supply Run';
+  }
+  function renderOperations(){
+    const s=window.HRState.get(), w=window.HRState.workStatus(), active=s.activeContract, food=s.cargo?.food||0;
+    let job=active?'<div class="work-card"><strong>'+active.title+'</strong><p>'+active.text+'</p><div class="work-meta"><span>Destination: Meridian Exchange</span><span>Reward: 220 cr</span></div></div>':'<div class="work-card">No active work assignment.</div>';
+    operationsCopy.innerHTML='<div class="cargo-meter"><strong>Cargo hold</strong><div>'+w.cargoUsed+' / '+w.cargoCapacity+' spaces used</div><div>Packaged Food: '+food+'</div></div>'+job+'<p>Operator standing: <strong>'+s.reputation+'</strong></p>';
+    const ready=active?.id==='haven-food'&&s.location==='meridian'&&s.condition==='docked'&&s.operatorLocation==='aboard';
+    completeSupplyRunButton.hidden=!ready;
+  }
   function personIntent(id){ const s=window.HRState.get(); if(id==='seli'&&s.location==='meridian'&&s.condition==='docked'&&s.operatorLocation==='meridian-dock') openPanel('seli'); }
   function consoleIntent(id){
     if(travelInProgress||dockingInProgress||stationTransitionInProgress||window.HRState.get().operatorLocation!=='aboard') return;
-    if(id==='engineering'||id==='navigation'){ openPanel(id); return; }
-    const names={operations:'Operations / Cargo',communications:'Communications'};
-    const label=document.getElementById('interaction-label'); label.textContent=`${names[id]} — not active in this proof`;
-    window.setTimeout(()=>{ if(label.textContent.includes('not active')) label.textContent=''; },1800);
+    if(['engineering','navigation','operations','communications'].includes(id)){ openPanel(id); return; }
   }
   window.addEventListener('hr:console',(event)=>consoleIntent(event.detail.id));
   window.addEventListener('hr:person',(event)=>personIntent(event.detail.id));
   document.querySelectorAll('[data-console]').forEach((button)=>button.addEventListener('click',()=>consoleIntent(button.dataset.console)));
-  closeEngineeringButton.addEventListener('click',closePanel); closeNavigationButton.addEventListener('click',closePanel); closeSeliButton.addEventListener('click',closePanel);
+  closeEngineeringButton.addEventListener('click',closePanel); closeNavigationButton.addEventListener('click',closePanel); closeSeliButton.addEventListener('click',closePanel); closeCommunicationsButton.addEventListener('click',closePanel); closeOperationsButton.addEventListener('click',closePanel);
+  acceptSupplyRunButton.addEventListener('click',()=>{const r=window.HRState.acceptSupplyRun();if(r.ok){renderCommunications();}});
+  completeSupplyRunButton.addEventListener('click',()=>{const r=window.HRState.completeSupplyRun();if(r.ok){renderOperations();}});
   seliChoices.addEventListener('click',(event)=>{ const button=event.target.closest('[data-seli-choice]'); if(!button) return; const choice=button.dataset.seliChoice; if(choice==='close'){closePanel();return;} const result=window.HRState.chooseSeliFirstMeeting(choice); if(result.ok) renderSeli(); });
   backdrop.addEventListener('click',(event)=>{ if(event.target===backdrop) closePanel(); });
   document.addEventListener('keydown',(event)=>{ if(event.key==='Escape'&&!backdrop.hidden) closePanel(); });
@@ -103,7 +118,7 @@
     try { window.HRState.returnToShip(); await window.WayfarerScene.showStationTransition('RETURNING TO WAYFARER'); }
     finally { stationTransitionInProgress=false; returnShipButton.disabled=false; renderLocation(window.HRState.get()); }
   });
-  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress&&!stationTransitionInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); if(activePanel==='seli') renderSeli(); });
+  window.HRState.subscribe((state)=>{ if(!travelInProgress&&!dockingInProgress&&!stationTransitionInProgress) renderLocation(state); if(activePanel==='engineering') renderEngineering(); if(activePanel==='navigation') renderNavigation(); if(activePanel==='seli') renderSeli(); if(activePanel==='communications') renderCommunications(); if(activePanel==='operations') renderOperations(); });
   async function start(){
     try { renderLocation(window.HRState.get()); await window.WayfarerScene.mount(sceneHost); document.body.classList.add('ready'); }
     catch(error){ console.error('Wayfarer graphical proof failed to start.',error); document.getElementById('startup-error').hidden=false; }
