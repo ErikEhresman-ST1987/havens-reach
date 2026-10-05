@@ -5,3 +5,5 @@
 /* Station contextual actions: separate destinations from return-to-ship. */
 #commons-enter-button{right:max(18px,env(safe-area-inset-right));bottom:max(78px,calc(env(safe-area-inset-bottom) + 60px));background:rgba(65,40,18,.94);border-color:rgba(239,178,93,.7)}
 #commons-back-button{right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom))}
+
+.destination[hidden]{display:none}
