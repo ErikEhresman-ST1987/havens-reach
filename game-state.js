@@ -50,8 +50,8 @@ function ensureTavyrel(){
 function tavyrelContinuity(){
  ensureFieldOperation();ensureTavyrel();
  const t=state.npcs.tavyrel,op=state.fieldOperations.gowlDistress,resolvedTrip=Number.isFinite(t.memory.rescueResolvedTrip)?t.memory.rescueResolvedTrip:op.resolvedTrip;
- const eligible=op.status==='resolved'&&Number.isFinite(resolvedTrip)&&state.tripCount>=resolvedTrip+2;
- return{name:'Tavyrel',met:t.met,eligibleForProspectReunion:eligible,reunionCompleted:Boolean(t.memory.metAgainAtLastLantern),rescueResolvedTrip:Number.isFinite(resolvedTrip)?resolvedTrip:null,outcome:op.outcome,vesselSaved:Boolean(t.memory.vesselSaved),vesselAbandoned:Boolean(t.memory.vesselAbandoned),wayfarerDamaged:Boolean(t.memory.wayfarerDamaged)};
+ const legacyResolved=op.status==='resolved'&&!Number.isFinite(resolvedTrip);if(legacyResolved&&!Number.isFinite(t.memory.rescueResolvedTrip)){t.memory.rescueResolvedTrip=Math.max(0,state.tripCount-2);save();}const effectiveResolvedTrip=Number.isFinite(t.memory.rescueResolvedTrip)?t.memory.rescueResolvedTrip:resolvedTrip;const eligible=op.status==='resolved'&&Number.isFinite(effectiveResolvedTrip)&&state.tripCount>=effectiveResolvedTrip+2;
+ return{name:'Tavyrel',met:t.met,eligibleForProspectReunion:eligible,reunionCompleted:Boolean(t.memory.metAgainAtLastLantern),rescueResolvedTrip:Number.isFinite(effectiveResolvedTrip)?effectiveResolvedTrip:null,outcome:op.outcome,vesselSaved:Boolean(t.memory.vesselSaved),vesselAbandoned:Boolean(t.memory.vesselAbandoned),wayfarerDamaged:Boolean(t.memory.wayfarerDamaged)};
 }
 function fieldOperation(){ensureFieldOperation();return JSON.parse(JSON.stringify(state.fieldOperations.gowlDistress));}
 function acknowledgeCommunications(){ensureFieldOperation();const op=state.fieldOperations.gowlDistress;if(op.status==='signal-received'&&!op.signalSeen){op.signalSeen=true;save();notify();return{ok:true,state:snapshot()};}return{ok:false,state:snapshot()};}
