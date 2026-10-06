@@ -7,3 +7,7 @@
 #commons-back-button{right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom))}
 
 .destination[hidden]{display:none}
+
+#gantry-enter-button{right:max(18px,env(safe-area-inset-right));bottom:max(138px,calc(env(safe-area-inset-bottom) + 120px));background:rgba(65,40,18,.94);border-color:rgba(239,178,93,.7)}
+#gantry-back-button{right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom))}
+#gantry-copy{line-height:1.5;color:#d7d8d6}
