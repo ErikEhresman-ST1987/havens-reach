@@ -135,7 +135,7 @@ function workOffers(location=state.location){
  if(record&&Array.isArray(record.offers)){
   return record.offers.map(id=>pool.find(c=>c.id===id)||record.generated?.find(c=>c.id===id)).filter(Boolean);
  }
- if(!STATION_FREIGHT[location])return[];
+ if(!STATION_ECONOMY[location])return[];
  const authored=shuffled(pool).slice(0,1);
  const generated=[0,1].map(i=>generatedContract(location,i,state.tripCount)).filter(Boolean);
  const offers=[...authored,...generated];
