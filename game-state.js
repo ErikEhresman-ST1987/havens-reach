@@ -23,21 +23,35 @@ const CONTRACTS={
   {id:'prospect-relay-spares',title:'Relay Spare Set',destination:'calder',reward:405,cargo:{machineParts:1},rep:1,text:"A navigation crew at Calder's Drift needs a compact set of relay spares before its next maintenance pass."}
  ]};
 
-const STATION_FREIGHT={
- haven:[['Factory Components','machineParts','Industrial replacement assemblies'],['Family Provisions','food','Packaged provisions for frontier households'],['Clinic Restock','medicine','Medical supplies for a remote clinic']],
- meridian:[['Distribution Freight','food','Consolidated commercial supplies'],['Technical Equipment','machineParts','Replacement equipment for a station crew'],['Medical Consignment','medicine','Priority clinical inventory']],
- prospect:[['Survey Equipment','machineParts','Survey-team replacement parts'],['Frontier Provisions','food','Supplies for an isolated crew'],['Research Samples','ore','Sealed geological samples']],
- 'red-mesa':[['Excavation Components','machineParts','Parts for industrial extraction machinery'],['Crew Provisions','food','Food for an outbound industrial crew'],['Mineral Assay','ore','Processed mineral samples for analysis']],
- pelagos:[['Laboratory Reagents','medicine','Temperature-controlled laboratory materials'],['Scientific Apparatus','machineParts','Precision research equipment'],['Research Provisions','food','Food and supplies for visiting research staff']]
+// Local, independently authored economic model. Contracts follow actual supply/demand pairs.
+// Calder is deliberately excluded: it receives specific authored maintenance work only.
+const STATION_ECONOMY={
+ haven:{exports:{machineParts:'Industrial assemblies',food:'Household provisions'},imports:{medicine:'Clinic supplies',ore:'Industrial mineral feedstock'}},
+ meridian:{exports:{machineParts:'Commercial equipment',medicine:'Medical consignments',food:'Distribution provisions'},imports:{ore:'Raw material shipments',food:'Commercial provisions',machineParts:'Trade stock'}},
+ prospect:{exports:{ore:'Survey mineral samples'},imports:{food:'Frontier provisions',machineParts:'Survey equipment',medicine:'Medical stores'}},
+ 'red-mesa':{exports:{ore:'Assayed mineral freight'},imports:{machineParts:'Excavation components',food:'Crew provisions',medicine:'Safety and medical supplies'}},
+ pelagos:{exports:{medicine:'Research-grade medical materials'},imports:{machineParts:'Scientific apparatus',ore:'Research samples',food:'Laboratory provisions'}}
 };
+const ECONOMY_STATIONS=Object.keys(STATION_ECONOMY);
 function generatedContract(location,index,trip){
- const choices=STATION_FREIGHT[location];if(!choices)return null;
- const destinations=['haven','meridian','prospect','red-mesa','pelagos'].filter(id=>id!==location);
- const seed=trip*17+index*11+['haven','meridian','prospect','red-mesa','pelagos'].indexOf(location)*7;
- const destination=destinations[((seed%destinations.length)+destinations.length)%destinations.length];
- const [title,good,description]=choices[((seed+index)%choices.length+choices.length)%choices.length];
- const quantity=1+(Math.abs(seed)%3),distance=routeDistance(location,destination);
- return{id:'generated-'+location+'-'+trip+'-'+index,title,cargo:{[good]:quantity},destination,reward:Math.ceil(95+distance*7+quantity*38),rep:1,text:description+' requested at '+destination.replace(/-/g,' ')+'. Freight is provided when accepted.',generated:true};
+ const origin=STATION_ECONOMY[location];if(!origin)return null;
+ const candidates=[];
+ for(const [good,exportLabel] of Object.entries(origin.exports)){
+  for(const destination of ECONOMY_STATIONS){
+   if(destination===location||!STATION_ECONOMY[destination].imports[good]||!known(destination))continue;
+   candidates.push({good,exportLabel,destination,need:STATION_ECONOMY[destination].imports[good]});
+  }
+ }
+ if(!candidates.length)return null;
+ const originIndex=ECONOMY_STATIONS.indexOf(location);
+ const seed=trip*17+index*11+originIndex*7;
+ const route=candidates[((seed%candidates.length)+candidates.length)%candidates.length];
+ const quantity=1+(Math.abs(seed)%3),distance=routeDistance(location,route.destination);
+ const reward=Math.ceil(95+distance*7+quantity*38);
+ return{id:'generated-'+location+'-'+trip+'-'+index,title:route.exportLabel+' Delivery',
+  cargo:{[route.good]:quantity},destination:route.destination,reward,rep:1,
+  text:route.exportLabel+' from '+location.replace(/-/g,' ')+' requested for '+route.need.toLowerCase()+' at '+route.destination.replace(/-/g,' ')+'. Freight is provided when accepted.',
+  generated:true,status:'offered'};
 }
 const SELI_PRIVATE_JOB={id:'seli-private-freight',title:'Seli’s Private Freight',destination:'haven',reward:280,cargo:{food:2},rep:1,text:'A Meridian commercial client has entrusted Seli with a small shipment of packaged provisions for Haven. The client needs a dependable independent operator.',privateReferral:true};
 const PRECISION_JOB={id:'meridian-precision-instrument',title:'Precision Instrument Transfer',destination:'prospect',reward:460,cargo:{precisionInstrument:2},rep:1,requiredPackage:'freight-handling-package',text:'A sealed precision instrument must reach Prospect’s research facility. Stabilized environmental handling is essential; ordinary cargo restraints are insufficient.'};
@@ -123,7 +137,7 @@ function workOffers(location=state.location){
  }
  if(!STATION_FREIGHT[location])return[];
  const authored=shuffled(pool).slice(0,1);
- const generated=[0,1].map(i=>generatedContract(location,i,state.tripCount));
+ const generated=[0,1].map(i=>generatedContract(location,i,state.tripCount)).filter(Boolean);
  const offers=[...authored,...generated];
  state.contractBoards[location]={offers:offers.map(c=>c.id),generated,trip:state.tripCount};
  save();return offers;
@@ -140,7 +154,7 @@ function acceptContract(id){
  if(offer.requiredPackage&&state.ship.specialization.installed!==offer.requiredPackage)return{ok:false,reason:'specialization',state:snapshot()};
  if(cargoUsed()+cargoNeeded(offer)>state.ship.cargoCapacity)return{ok:false,reason:'cargo',state:snapshot()};
  Object.entries(offer.cargo||{}).forEach(([good,qty])=>state.cargo[good]=(state.cargo[good]||0)+qty);
- state.activeContracts.push({...offer,cargo:{...(offer.cargo||{})},origin:state.location});
+ state.activeContracts.push({...offer,status:'accepted',cargo:{...(offer.cargo||{})},origin:state.location});
  state.contractBoards[state.location].offers=state.contractBoards[state.location].offers.filter(x=>x!==id);
  save();notify();return{ok:true,state:snapshot()};
 }
