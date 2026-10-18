@@ -9,8 +9,8 @@ const NAV_POSITIONS={haven:[0,0],meridian:[18,0],prospect:[33,20],calder:[50,34]
 const CONTRACTS={
  haven:[
   {id:'haven-food',title:'Supply Run',destination:'meridian',reward:220,cargo:{food:2},rep:1,text:'A family-owned canteen needs packaged food delivered to Meridian Exchange.'},
-  {id:'haven-survey',title:'Survey Data Courier',destination:'prospect',reward:420,cargo:{},rep:1,text:'Carry sealed geological survey data to Prospect Reach.'},
-  {id:'haven-family-parcels',title:'Frontier Family Parcels',destination:'prospect',reward:390,cargo:{},rep:1,text:'Carry a consolidated packet of family parcels and recorded messages from Haven to workers at Prospect Reach.'}
+  {id:'haven-survey',title:'Survey Data Courier',destination:'prospect',reward:300,cargo:{},rep:1,text:'Carry sealed geological survey data to Prospect Reach.'},
+  {id:'haven-family-parcels',title:'Frontier Family Parcels',destination:'prospect',reward:280,cargo:{},rep:1,text:'Carry a consolidated packet of family parcels and recorded messages from Haven to workers at Prospect Reach.'}
  ],
  meridian:[
   {id:'meridian-parts',title:'Machine Parts Delivery',destination:'prospect',reward:310,cargo:{machineParts:2},rep:1,text:'A Kharok maintenance crew is short on replacement actuator assemblies.'},
@@ -47,7 +47,7 @@ function generatedContract(location,index,trip){
  const seed=trip*17+index*11+originIndex*7;
  const route=candidates[((seed%candidates.length)+candidates.length)%candidates.length];
  const quantity=1+(Math.abs(seed)%3),distance=routeDistance(location,route.destination);
- const reward=Math.ceil(95+distance*7+quantity*38);
+ const reward=Math.ceil(120+distance*5+quantity*35);
  return{id:'generated-'+location+'-'+trip+'-'+index,title:route.exportLabel+' Delivery',
   cargo:{[route.good]:quantity},destination:route.destination,reward,rep:1,
   text:route.exportLabel+' from '+location.replace(/-/g,' ')+' requested for '+route.need.toLowerCase()+' at '+route.destination.replace(/-/g,' ')+'. Freight is provided when accepted.',
