@@ -1,7 +1,7 @@
 (() => {
 'use strict';
 const STORAGE_KEY='havensReachGraphicalProofV1',DATA_VERSION=1,REPAIR_COST_PER_POINT=10;
-const TRADE_MARKETS={haven:{food:{buy:45,sell:35},machineParts:{buy:80,sell:70},medicine:{buy:70,sell:60}},meridian:{food:{buy:65,sell:55},machineParts:{buy:60,sell:50},medicine:{buy:75,sell:65}},prospect:{food:{buy:85,sell:73},machineParts:{buy:105,sell:92},medicine:{buy:105,sell:90}},'red-mesa':{food:{buy:88,sell:78},machineParts:{buy:146,sell:128},medicine:{buy:312,sell:286}},pelagos:{food:{buy:102,sell:68},machineParts:{buy:132,sell:112},medicine:{buy:246,sell:164}}};
+const TRADE_MARKETS={haven:{food:{buy:42,sell:32},machineParts:{buy:78,sell:64},medicine:{buy:105,sell:85}},meridian:{food:{buy:55,sell:44},machineParts:{buy:58,sell:46},medicine:{buy:100,sell:82}},prospect:{food:{buy:78,sell:65},machineParts:{buy:100,sell:85},medicine:{buy:135,sell:112}},'red-mesa':{food:{buy:83,sell:70},machineParts:{buy:112,sell:94},medicine:{buy:155,sell:130}},pelagos:{food:{buy:76,sell:63},machineParts:{buy:105,sell:90},medicine:{buy:80,sell:65}}};
 const FIELD_LOCATION='gowl-distress-field';
 const LOCATIONS=new Set(['haven','meridian','prospect','calder','red-mesa','pelagos',FIELD_LOCATION]),DOCKABLE=new Set(['haven','meridian','prospect','calder','red-mesa','pelagos']),SERVICED=new Set(['haven','meridian','prospect','red-mesa','pelagos']);
 // Stable map positions; travel is direct, with distance-based fuel use. Field encounters retain their own coordinates.
